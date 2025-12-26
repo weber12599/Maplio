@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <title>Maplio</title>
+
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+
+        <style>
+            /* --- 1. 全域基礎設定 (Global Base) --- */
+            body {
+                /* 使用系統級精緻字體 */
+                font-family:
+                    'Inter',
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    'Segoe UI',
+                    Roboto,
+                    Helvetica,
+                    Arial,
+                    sans-serif;
+                background-color: #0f172a; /* Slate 900 */
+                color: #f1f5f9;
+                /* 禁止 body 整體捲動，交由內部的 aside 或 main 處理 */
+                overflow: hidden;
+                /* 適配 iPhone 底部安全區域 (Home Bar) */
+                padding-bottom: env(safe-area-inset-bottom);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* --- 2. 實用工具類 (Utility Classes) --- */
+            /* 隱藏捲軸但保持捲動功能 (App-like Feel) */
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            /* 提升拖拽體驗：禁止長按彈出選單與文字選取 */
+            .drag-handle {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+                cursor: grab;
+            }
+            .drag-handle:active {
+                cursor: grabbing;
+            }
+
+            /* --- 3. 地圖效能優化 (Leaflet & Map Core) --- */
+            /* 防止載入前出現白色閃爍 */
+            #mobile-map,
+            #desktop-map,
+            .leaflet-container {
+                background: #0f172a !important;
+                outline: none;
+            }
+
+            /* 解決 Mobile 上的捲動干擾，確保地圖平移流暢 */
+            .leaflet-container {
+                touch-action: pan-x pan-y !important;
+            }
+
+            /* 開啟 GPU 硬體加速，減少平移時的模糊感 */
+            .leaflet-tile-container {
+                will-change: transform;
+            }
+
+            /* 修正地圖切換動畫細節 */
+            .leaflet-fade-anim .leaflet-tile,
+            .leaflet-zoom-anim .leaflet-zoom-animated {
+                transition-duration: 0.3s !important;
+            }
+
+            /* --- 4. 行動裝置專屬優化 (Mobile Specific) --- */
+            @media (max-width: 767px) {
+                #mobile-map {
+                    min-height: 220px;
+                    height: 220px;
+                    width: 100%;
+                    position: relative;
+                    overflow: hidden;
+                    z-index: 10;
+                    /* 強化：確保地圖層獨立於其他 UI 元件 */
+                    will-change: transform;
+                    transform: translate3d(0, 0, 0);
+                    background: #0f172a;
+                }
+            }
+
+            /* 拖拽時的幽靈元件樣式 (vuedraggable) */
+            .sortable-ghost {
+                opacity: 0.2;
+                background: #3b82f6 !important;
+                border-radius: 2rem;
+            }
+        </style>
+    </head>
+
+    <body class="bg-slate-900 text-slate-100 antialiased overflow-hidden">
+        <div id="app"></div>
+
+        <script type="module" src="/src/main.js"></script>
+    </body>
+</html>

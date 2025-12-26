@@ -1,0 +1,48 @@
+name: Deploy to Firebase Hosting (Production)
+
+on:
+    workflow_dispatch: # 這會開啟 GitHub 介面上的「Run workflow」按鈕
+
+jobs:
+    build_and_deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0 # 必須設定為 0 才能讀取到所有 Git Tags
+
+            - name: Get Version Tag
+              id: get_version
+              run: |
+                  # 嘗試取得當前 commit 的 exact tag
+                  VERSION=$(git describe --tags --exact-match 2>/dev/null || echo "NO_TAG")
+                  if [ "$VERSION" = "NO_TAG" ]; then
+                    echo "錯誤：當前 commit 沒有標籤 (Tag)，中斷部署。"
+                    exit 1
+                  fi
+                  echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+                  echo "版本號確認: $VERSION"
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Build Project
+              run: npm run build
+              env:
+                  VITE_APP_VERSION: ${{ env.APP_VERSION }}
+                  VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+                  VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+                  VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+                  VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+                  VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+                  VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+            - name: Deploy to Firebase Hosting
+              uses: FirebaseExtended/action-hosting-deploy@v0
+              with:
+                  repoToken: '${{ secrets.GITHUB_TOKEN }}'
+                  firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO }}'
+                  channelId: live
+                  projectId: maplio
+                  message: 'Release ${{ env.APP_VERSION }}'
