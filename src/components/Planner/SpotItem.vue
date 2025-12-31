@@ -33,7 +33,28 @@
                             {{ spot.timeStart }} - {{ spot.timeEnd }}
                         </span>
 
-                        <p class="font-bold truncate opacity-90 tracking-tight">{{ spot.name }}</p>
+                        <div class="flex items-center gap-2 truncate">
+                            <p class="font-bold opacity-90 tracking-tight truncate">
+                                {{ spot.name || '未命名景點' }}
+                            </p>
+
+                            <span
+                                v-if="spot.source === 'google_parsed'"
+                                class="text-[8px] px-1.2 py-0.2 border border-emerald-500/50 text-emerald-500 rounded font-bold uppercase shrink-0"
+                                >Map</span
+                            >
+                            <span
+                                v-else-if="spot.source === 'url_only'"
+                                class="text-[8px] px-1.2 py-0.2 border border-amber-500/50 text-amber-500 rounded font-bold uppercase shrink-0"
+                                >Link</span
+                            >
+                            <span
+                                v-else-if="spot.source === 'search'"
+                                class="text-[8px] px-1.2 py-0.2 border border-blue-500/50 text-blue-500 rounded font-bold uppercase shrink-0"
+                                >Web</span
+                            >
+                        </div>
+
                         <button
                             @click="$emit('edit', spot)"
                             class="opacity-30 hover:opacity-100 transition-opacity"
@@ -106,7 +127,6 @@
                     <i class="fa-solid fa-route text-xs"></i>
                 </button>
             </div>
-
             <div :class="['w-[2px] h-4 transition-colors', themeConfig.lineClass]"></div>
         </div>
     </div>

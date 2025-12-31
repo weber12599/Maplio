@@ -106,6 +106,15 @@
                                     />
                                 </template>
                             </draggable>
+                            <div
+                                v-if="currentDaySpots.length === 0"
+                                :class="[
+                                    'text-center py-20 border-2 border-dashed rounded-[3rem] opacity-30',
+                                    activeThemeConfig.secondaryBorderClass
+                                ]"
+                            >
+                                <p class="text-sm font-bold">今天還沒安排行程，試試搜尋景點吧！</p>
+                            </div>
                         </div>
                     </aside>
                     <LeafletMap
@@ -274,8 +283,26 @@ export default {
             if (query.startsWith('http')) {
                 const parsed = parseGoogleMapUrl(query)
                 this.manualSpot = parsed
-                    ? { ...parsed, url: query, notes: '', timeStart: '', timeEnd: '' }
-                    : { url: query, notes: '', timeStart: '', timeEnd: '' }
+                    ? {
+                          ...parsed,
+                          url: query,
+                          notes: '',
+                          timeStart: '',
+                          timeEnd: '',
+                          showOnMap: true,
+                          source: 'google_parsed'
+                      }
+                    : {
+                          name: '',
+                          url: query,
+                          notes: '',
+                          timeStart: '',
+                          timeEnd: '',
+                          showOnMap: false,
+                          lat: null,
+                          lng: null,
+                          source: 'url_only'
+                      }
                 this.isEditingExistingSpot = false
                 this.showManualSpotForm = true
             } else {
@@ -304,7 +331,8 @@ export default {
                 notes: '',
                 timeStart: '',
                 timeEnd: '',
-                showOnMap: true
+                showOnMap: true,
+                source: 'search'
             }
             this.showManualSpotForm = true
             this.searchResults = []
