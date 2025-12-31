@@ -100,9 +100,7 @@
                         v-if="showCreateForm"
                         class="max-w-md mx-auto p-8 bg-slate-800 rounded-[2.5rem] border border-blue-500/30 animate-fade space-y-6 mb-10 shadow-2xl"
                     >
-                        <h3 class="font-bold text-xl text-blue-400">
-                            建立新旅程 {{ isDemoMode ? '(本地儲存)' : '' }}
-                        </h3>
+                        <h3 class="font-bold text-xl text-blue-400">建立新旅程</h3>
                         <div class="space-y-4">
                             <div>
                                 <label class="text-[10px] text-slate-500 font-black uppercase ml-1"
@@ -110,8 +108,8 @@
                                 >
                                 <input
                                     v-model="newTrip.name"
-                                    placeholder="例如：東京跨年五日遊..."
-                                    class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white"
+                                    placeholder="例如：東京五日遊..."
+                                    class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 text-white outline-none"
                                 />
                             </div>
                             <div class="flex gap-4">
@@ -123,7 +121,7 @@
                                     <input
                                         type="date"
                                         v-model="newTrip.startDate"
-                                        class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 outline-none text-white"
+                                        class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 text-white outline-none"
                                     />
                                 </div>
                                 <div class="w-24">
@@ -135,7 +133,7 @@
                                         type="number"
                                         v-model="newTrip.duration"
                                         min="1"
-                                        class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 outline-none text-white"
+                                        class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 text-white outline-none"
                                     />
                                 </div>
                             </div>
@@ -143,13 +141,13 @@
                         <div class="flex gap-4 pt-4">
                             <button
                                 @click="showCreateForm = false"
-                                class="flex-grow py-3 text-slate-500 font-bold hover:text-slate-300"
+                                class="flex-grow py-3 text-slate-500 font-bold"
                             >
                                 取消
                             </button>
                             <button
                                 @click="createNewTrip"
-                                class="flex-grow py-3 bg-blue-600 rounded-xl font-bold shadow-lg shadow-blue-600/20"
+                                class="flex-grow py-3 bg-blue-600 rounded-xl font-bold"
                             >
                                 建立行程
                             </button>
@@ -173,9 +171,9 @@
                                         {{ trip.name }}
                                     </h3>
                                     <div
-                                        class="mt-4 flex items-center gap-3 text-slate-500 text-sm font-medium"
+                                        class="mt-4 flex items-center gap-3 text-slate-500 text-sm"
                                     >
-                                        <span class="flex items-center gap-1"
+                                        <span
                                             ><i class="fa-solid fa-calendar-day"></i>
                                             {{ trip.startDate }}</span
                                         >
@@ -186,12 +184,12 @@
                                 <div class="mt-8 flex justify-between items-center">
                                     <button
                                         @click.stop="deleteTrip(trip.id)"
-                                        class="text-slate-700 hover:text-red-500 transition-colors"
+                                        class="text-slate-700 hover:text-red-500"
                                     >
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                     <div
-                                        class="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center group-hover:bg-blue-600 transition-all"
+                                        class="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center group-hover:bg-blue-600"
                                     >
                                         <i
                                             class="fa-solid fa-arrow-right text-slate-700 group-hover:text-white"
@@ -234,7 +232,7 @@
                                 </button>
                                 <button
                                     @click="addDay"
-                                    class="px-4 py-2 bg-slate-800 text-slate-600 rounded-2xl hover:text-white transition-colors"
+                                    class="px-4 py-2 bg-slate-800 text-slate-600 rounded-2xl hover:text-white"
                                 >
                                     <i class="fa-solid fa-plus text-xs"></i>
                                 </button>
@@ -244,10 +242,10 @@
                         <div class="flex-grow overflow-y-auto no-scrollbar p-6 space-y-8 pb-32">
                             <div class="flex justify-between items-start gap-4">
                                 <div class="flex-grow min-w-0">
-                                    <template v-if="!isEditingTripName">
-                                        <h2
-                                            class="text-2xl font-black text-white truncate flex items-center gap-2"
-                                        >
+                                    <h2
+                                        class="text-2xl font-black text-white truncate flex items-center gap-2"
+                                    >
+                                        <template v-if="!isEditingTripName">
                                             {{ currentTrip.name }}
                                             <button
                                                 @click="startEditTripName"
@@ -255,17 +253,17 @@
                                             >
                                                 <i class="fa-solid fa-pen text-sm"></i>
                                             </button>
-                                        </h2>
-                                    </template>
-                                    <template v-else>
-                                        <input
-                                            v-model="tempTripName"
-                                            @keyup.enter="saveTripName"
-                                            @blur="saveTripName"
-                                            ref="tripNameInput"
-                                            class="bg-transparent border-b-2 border-blue-500 text-2xl font-black text-white outline-none w-full"
-                                        />
-                                    </template>
+                                        </template>
+                                        <template v-else>
+                                            <input
+                                                v-model="tempTripName"
+                                                @keyup.enter="saveTripName"
+                                                @blur="saveTripName"
+                                                ref="tripNameInput"
+                                                class="bg-transparent border-b-2 border-blue-500 text-2xl font-black text-white outline-none w-full"
+                                            />
+                                        </template>
+                                    </h2>
                                     <div class="flex items-center gap-3 mt-2">
                                         <p
                                             class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em]"
@@ -291,43 +289,45 @@
                                 </button>
                             </div>
 
-                            <div class="relative group">
-                                <div class="relative">
-                                    <i
-                                        v-if="!isSearching"
-                                        class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"
-                                    ></i>
-                                    <i
-                                        v-else
-                                        class="fa-solid fa-circle-notch fa-spin absolute left-4 top-1/2 -translate-y-1/2 text-blue-500"
-                                    ></i>
-                                    <input
-                                        v-model="searchQuery"
-                                        @compositionstart="isComposing = true"
-                                        @compositionend="isComposing = false"
-                                        @keydown.enter="handleEnter"
-                                        @blur="setTimeout(() => (showDropdown = false), 250)"
-                                        placeholder="搜尋地點並加入行程..."
-                                        class="w-full pl-12 pr-4 py-4 bg-slate-800/50 rounded-2xl text-sm outline-none border border-transparent focus:border-blue-500/50 transition-all shadow-inner text-white"
-                                    />
-                                </div>
-                                <div
-                                    v-if="showDropdown && searchResults.length > 0"
-                                    class="absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-[100] overflow-hidden max-h-60 overflow-y-auto no-scrollbar"
-                                >
-                                    <button
-                                        v-for="(result, index) in searchResults"
-                                        :key="index"
-                                        @click="selectLocation(result)"
-                                        class="w-full text-left px-4 py-4 hover:bg-slate-700 border-b border-slate-700/50 last:border-none transition-colors"
+                            <div class="flex gap-2">
+                                <div class="relative group flex-grow">
+                                    <div class="relative">
+                                        <i
+                                            v-if="!isSearching"
+                                            class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"
+                                        ></i>
+                                        <i
+                                            v-else
+                                            class="fa-solid fa-circle-notch fa-spin absolute left-4 top-1/2 -translate-y-1/2 text-blue-500"
+                                        ></i>
+                                        <input
+                                            v-model="searchQuery"
+                                            @compositionstart="isComposing = true"
+                                            @compositionend="isComposing = false"
+                                            @keydown.enter="handleEnter"
+                                            @blur="setTimeout(() => (showDropdown = false), 250)"
+                                            placeholder="搜尋地點或貼上 Google Map 網址..."
+                                            class="w-full pl-12 pr-4 py-4 bg-slate-800/50 rounded-2xl text-sm outline-none border border-transparent focus:border-blue-500/50 transition-all shadow-inner text-white"
+                                        />
+                                    </div>
+                                    <div
+                                        v-if="showDropdown && searchResults.length > 0"
+                                        class="absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-[100] overflow-hidden max-h-60 overflow-y-auto no-scrollbar"
                                     >
-                                        <div class="font-bold text-sm text-slate-200">
-                                            {{ result.display_name.split(',')[0] }}
-                                        </div>
-                                        <div class="text-[10px] text-slate-500 truncate">
-                                            {{ result.display_name }}
-                                        </div>
-                                    </button>
+                                        <button
+                                            v-for="(result, index) in searchResults"
+                                            :key="index"
+                                            @click="selectLocation(result)"
+                                            class="w-full text-left px-4 py-4 hover:bg-slate-700 border-b border-slate-700/50 last:border-none transition-colors"
+                                        >
+                                            <div class="font-bold text-sm text-slate-200">
+                                                {{ result.display_name.split(',')[0] }}
+                                            </div>
+                                            <div class="text-[10px] text-slate-500 truncate">
+                                                {{ result.display_name }}
+                                            </div>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -429,12 +429,12 @@
                                                     class="flex flex-col gap-3"
                                                 >
                                                     <button
-                                                        @click="searchOnMaps(element)"
-                                                        title="在地圖上搜尋此景點"
+                                                        @click="openSpotOnMaps(element)"
+                                                        title="開啟地圖網址"
                                                         class="w-10 h-10 flex items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg active:scale-90 transition-all"
                                                     >
                                                         <i
-                                                            class="fa-solid fa-magnifying-glass-location text-xs"
+                                                            class="fa-solid fa-location-dot text-xs"
                                                         ></i>
                                                     </button>
                                                     <button
@@ -547,6 +547,122 @@
                         class="hidden md:block flex-grow h-full bg-slate-900"
                     ></div>
                 </template>
+
+                <div
+                    v-if="showManualSpotForm"
+                    class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+                >
+                    <div
+                        class="w-full max-w-md bg-slate-800 rounded-[2.5rem] p-8 border border-blue-500/30 shadow-2xl space-y-6"
+                    >
+                        <h3 class="text-xl font-black text-blue-400">景點詳細資訊</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] text-slate-500 font-black uppercase ml-1"
+                                    >名稱 *</label
+                                >
+                                <input
+                                    v-model="manualSpot.name"
+                                    placeholder="請輸入名稱"
+                                    class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 text-white outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="flex-grow">
+                                    <label
+                                        class="text-[10px] text-slate-500 font-black uppercase ml-1"
+                                        >行程時間</label
+                                    >
+                                    <div class="flex items-center gap-2">
+                                        <input
+                                            type="time"
+                                            v-model="manualSpot.timeStart"
+                                            class="w-full bg-slate-900 rounded-xl px-3 py-2 text-[11px] text-blue-400 outline-none"
+                                        />
+                                        <span class="text-slate-700">-</span>
+                                        <input
+                                            type="time"
+                                            v-model="manualSpot.timeEnd"
+                                            class="w-full bg-slate-900 rounded-xl px-3 py-2 text-[11px] text-blue-400 outline-none"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-500 font-black uppercase ml-1"
+                                    >景點備註</label
+                                >
+                                <textarea
+                                    v-model="manualSpot.notes"
+                                    rows="2"
+                                    placeholder="備註..."
+                                    class="w-full bg-slate-900 rounded-xl px-4 py-3 text-xs text-slate-300 outline-none resize-none"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-500 font-black uppercase ml-1"
+                                    >Google Map 網址</label
+                                >
+                                <input
+                                    v-model="manualSpot.url"
+                                    placeholder="http://..."
+                                    class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 text-slate-500 text-[10px] outline-none"
+                                />
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center px-1">
+                                    <label class="text-[10px] text-slate-500 font-black uppercase"
+                                        >經緯度座標</label
+                                    >
+                                    <button
+                                        @click="pasteCoordinates"
+                                        class="text-[10px] bg-slate-700 text-blue-400 px-2 py-1 rounded-lg hover:bg-slate-600 transition-colors"
+                                    >
+                                        <i class="fa-solid fa-paste mr-1"></i> 從剪貼簿貼上 (Lat,
+                                        Lng)
+                                    </button>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="flex-grow">
+                                        <input
+                                            v-model.number="manualSpot.lat"
+                                            type="number"
+                                            step="any"
+                                            placeholder="緯度 (Lat)"
+                                            class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 text-white outline-none"
+                                        />
+                                    </div>
+                                    <div class="flex-grow">
+                                        <input
+                                            v-model.number="manualSpot.lng"
+                                            type="number"
+                                            step="any"
+                                            placeholder="經度 (Lng)"
+                                            class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 text-white outline-none"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-amber-500/80 italic ml-1">
+                                提示：若未填入經緯度座標，此景點將不會出現在左側地圖上。
+                            </p>
+                        </div>
+                        <div class="flex gap-4 pt-2">
+                            <button
+                                @click="showManualSpotForm = false"
+                                class="flex-grow py-3 text-slate-500 font-bold"
+                            >
+                                取消
+                            </button>
+                            <button
+                                @click="addManualSpot"
+                                class="flex-grow py-3 bg-blue-600 rounded-xl font-bold text-white shadow-lg"
+                            >
+                                加入行程
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -570,7 +686,6 @@ import draggable from 'vuedraggable'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-// 修正 Leaflet 預設標記圖示
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -608,7 +723,17 @@ export default {
             tempTransStart: '',
             tempTransEnd: '',
             resizeTimer: null,
-            appVersion: import.meta.env.VITE_APP_VERSION || 'v0.0.0-dev'
+            appVersion: import.meta.env.VITE_APP_VERSION || 'v0.0.0-dev',
+            showManualSpotForm: false,
+            manualSpot: {
+                name: '',
+                lat: null,
+                lng: null,
+                url: '',
+                notes: '',
+                timeStart: '',
+                timeEnd: ''
+            }
         }
     },
     computed: {
@@ -693,7 +818,7 @@ export default {
             } else {
                 const q = query(
                     collection(db, 'trips'),
-                    where('owner', '==', this.user.uid),
+                    where('members', 'array-contains', this.user.uid),
                     orderBy('createdAt', 'desc')
                 )
                 onSnapshot(q, (snap) => {
@@ -718,7 +843,7 @@ export default {
                     id: 'demo_' + Date.now(),
                     name: this.newTrip.name,
                     startDate: this.newTrip.startDate,
-                    owner: 'demo-user',
+                    members: ['demo-user'],
                     itinerary,
                     createdAt: new Date().toISOString()
                 }
@@ -729,7 +854,7 @@ export default {
                 await addDoc(collection(db, 'trips'), {
                     name: this.newTrip.name,
                     startDate: this.newTrip.startDate,
-                    owner: this.user.uid,
+                    members: [this.user.uid],
                     itinerary,
                     createdAt: new Date()
                 })
@@ -816,7 +941,44 @@ export default {
             window.history.pushState({}, '', window.location.pathname)
         },
         handleEnter() {
-            if (!this.isComposing && this.searchQuery) this.performSearch()
+            if (this.isComposing || !this.searchQuery) return
+
+            const input = this.searchQuery.trim()
+            const isUrl =
+                input.includes('http://') ||
+                input.includes('https://') ||
+                input.includes('googleusercontent.com')
+
+            if (isUrl) {
+                const urlCoordsMatch = input.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)
+                let parsedName = ''
+                let lat = null
+                let lng = null
+
+                if (urlCoordsMatch) {
+                    lat = parseFloat(urlCoordsMatch[1])
+                    lng = parseFloat(urlCoordsMatch[2])
+                    const nameMatch = input.match(/\/place\/([^\/]+)\//)
+                    if (nameMatch) {
+                        parsedName = decodeURIComponent(nameMatch[1].replace(/\+/g, ' '))
+                    }
+                }
+
+                this.manualSpot = {
+                    name: parsedName || '',
+                    lat: lat,
+                    lng: lng,
+                    url: input,
+                    notes: '',
+                    timeStart: '',
+                    timeEnd: ''
+                }
+                this.showManualSpotForm = true
+                this.searchQuery = ''
+                return
+            }
+
+            this.performSearch()
         },
         async performSearch() {
             this.isSearching = true
@@ -833,23 +995,40 @@ export default {
             }
         },
         selectLocation(result) {
-            const spot = {
-                id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
-                name: result.display_name.split(',')[0],
-                lat: parseFloat(result.lat),
-                lng: parseFloat(result.lon),
-                travelMode: 'auto',
+            const lat = parseFloat(result.lat)
+            const lng = parseFloat(result.lon)
+            const name = result.display_name.split(',')[0]
+
+            this.manualSpot = {
+                name: name,
+                lat: lat,
+                lng: lng,
+                url: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`,
                 notes: '',
                 timeStart: '',
-                timeEnd: '',
-                transportNotes: '',
-                transStart: '',
-                transEnd: ''
+                timeEnd: ''
             }
-            this.currentDaySpots.push(spot)
-            this.searchQuery = ''
+            this.showManualSpotForm = true
             this.showDropdown = false
-            this.saveData()
+            this.searchQuery = ''
+        },
+        // 新增：從剪貼簿貼上座標的邏輯
+        async pasteCoordinates() {
+            try {
+                const text = await navigator.clipboard.readText()
+                // 正規表達式匹配: (lat, lng) 或 lat, lng
+                const regex = /\(?\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*\)?/
+                const match = text.match(regex)
+                if (match) {
+                    this.manualSpot.lat = parseFloat(match[1])
+                    this.manualSpot.lng = parseFloat(match[2])
+                } else {
+                    alert('剪貼簿格式不正確，請確保格式為 (緯度, 經度)')
+                }
+            } catch (err) {
+                console.error('無法讀取剪貼簿: ', err)
+                alert('無法讀取剪貼簿，請檢查瀏覽器權限或手動輸入')
+            }
         },
         async saveData() {
             if (!this.currentTrip) return
@@ -931,12 +1110,15 @@ export default {
                 await this.saveData()
             }
         },
-        searchOnMaps(spot) {
-            if (!spot.lat || !spot.lng) return
-            window.open(
-                `https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}`,
-                '_blank'
-            )
+        openSpotOnMaps(spot) {
+            if (spot.url) {
+                window.open(spot.url, '_blank')
+            } else if (spot.lat && spot.lng) {
+                window.open(
+                    `https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}`,
+                    '_blank'
+                )
+            }
         },
         navBetweenSpots(start, end, mode) {
             let url = `https://www.google.com/maps/dir/?api=1&origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}`
@@ -957,6 +1139,35 @@ export default {
         },
         removeSpot(idx) {
             this.currentDaySpots.splice(idx, 1)
+            this.saveData()
+        },
+        addManualSpot() {
+            if (!this.manualSpot.name) return alert('請輸入名稱')
+            const spot = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                name: this.manualSpot.name,
+                lat: this.manualSpot.lat,
+                lng: this.manualSpot.lng,
+                url: this.manualSpot.url,
+                notes: this.manualSpot.notes,
+                timeStart: this.manualSpot.timeStart,
+                timeEnd: this.manualSpot.timeEnd,
+                travelMode: 'auto',
+                transportNotes: '',
+                transStart: '',
+                transEnd: ''
+            }
+            this.currentDaySpots.push(spot)
+            this.showManualSpotForm = false
+            this.manualSpot = {
+                name: '',
+                lat: null,
+                lng: null,
+                url: '',
+                notes: '',
+                timeStart: '',
+                timeEnd: ''
+            }
             this.saveData()
         }
     }
