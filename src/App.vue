@@ -29,13 +29,6 @@
 
             <main class="flex-grow flex flex-col md:flex-row overflow-hidden relative">
                 <div v-if="!currentTrip" class="flex-grow overflow-y-auto p-6 md:p-10 no-scrollbar">
-                    <TripCreateForm
-                        v-if="showCreateForm"
-                        :isDemo="isDemoMode"
-                        :user="user"
-                        @cancel="showCreateForm = false"
-                        @created="handleTripCreated"
-                    />
                     <div
                         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto"
                     >
@@ -124,6 +117,15 @@
                         class="hidden md:block"
                     />
                 </template>
+
+                <TripCreateForm
+                    v-if="showCreateForm"
+                    :isDemo="isDemoMode"
+                    :user="user"
+                    :themeConfig="activeThemeConfig"
+                    @cancel="showCreateForm = false"
+                    @created="handleTripCreated"
+                />
 
                 <SpotDialog
                     v-if="showManualSpotForm"

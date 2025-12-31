@@ -1,55 +1,99 @@
 <template>
     <div
-        class="max-w-md mx-auto p-8 bg-slate-800 rounded-[2.5rem] border border-blue-500/30 animate-fade space-y-6 mb-10 shadow-2xl"
+        :class="[
+            'fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-colors duration-500',
+            themeConfig.dialogOverlayClass
+        ]"
     >
-        <h3 class="font-bold text-xl text-blue-400">建立新旅程 {{ isDemo ? '(本地儲存)' : '' }}</h3>
-        <div class="space-y-4">
-            <div>
-                <label class="text-[10px] text-slate-500 font-black uppercase ml-1">旅程名稱</label>
-                <input
-                    v-model="newTrip.name"
-                    placeholder="例如：東京跨年五日遊..."
-                    class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-blue-500 text-white"
-                />
-            </div>
+        <div
+            :class="[
+                'w-full max-w-md rounded-[2.5rem] p-8 border transition-all duration-500 space-y-6 shadow-2xl',
+                themeConfig.dialogContainerClass
+            ]"
+        >
+            <h3 :class="['font-bold text-xl transition-colors', themeConfig.dialogTitleClass]">
+                建立新旅程 {{ isDemo ? '(本地儲存)' : '' }}
+            </h3>
 
-            <div class="flex gap-4">
-                <div class="flex-grow">
-                    <label class="text-[10px] text-slate-500 font-black uppercase ml-1"
-                        >起始日期</label
+            <div class="space-y-4">
+                <div>
+                    <label
+                        :class="[
+                            'text-[10px] font-black uppercase ml-1 transition-colors',
+                            themeConfig.dialogLabelClass
+                        ]"
+                        >旅程名稱</label
                     >
                     <input
-                        type="date"
-                        v-model="newTrip.startDate"
-                        class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 outline-none text-white"
+                        v-model="newTrip.name"
+                        placeholder="例如：東京跨年五日遊..."
+                        :class="[
+                            'w-full rounded-xl px-4 py-3 outline-none border transition-all',
+                            themeConfig.dialogInputClass
+                        ]"
                     />
                 </div>
-                <div class="w-24">
-                    <label class="text-[10px] text-slate-500 font-black uppercase ml-1">天數</label>
-                    <input
-                        type="number"
-                        v-model="newTrip.duration"
-                        min="1"
-                        class="w-full bg-slate-900 border-none rounded-xl px-4 py-3 outline-none text-white"
-                    />
+
+                <div class="flex gap-4">
+                    <div class="flex-grow">
+                        <label
+                            :class="[
+                                'text-[10px] font-black uppercase ml-1 transition-colors',
+                                themeConfig.dialogLabelClass
+                            ]"
+                            >起始日期</label
+                        >
+                        <input
+                            type="date"
+                            v-model="newTrip.startDate"
+                            :class="[
+                                'w-full rounded-xl px-4 py-3 outline-none border transition-all',
+                                themeConfig.dialogInputClass
+                            ]"
+                        />
+                    </div>
+                    <div class="w-24">
+                        <label
+                            :class="[
+                                'text-[10px] font-black uppercase ml-1 transition-colors',
+                                themeConfig.dialogLabelClass
+                            ]"
+                            >天數</label
+                        >
+                        <input
+                            type="number"
+                            v-model="newTrip.duration"
+                            min="1"
+                            :class="[
+                                'w-full rounded-xl px-4 py-3 outline-none border transition-all',
+                                themeConfig.dialogInputClass
+                            ]"
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="flex gap-4 pt-4">
-            <button
-                @click="$emit('cancel')"
-                class="flex-grow py-3 text-slate-500 font-bold hover:text-slate-300 transition-colors"
-            >
-                取消
-            </button>
-            <button
-                @click="handleCreate"
-                :disabled="isSubmitting"
-                class="flex-grow py-3 bg-blue-600 rounded-xl font-bold shadow-lg shadow-blue-600/20 active:scale-95 transition-all disabled:opacity-50"
-            >
-                {{ isSubmitting ? '建立中...' : '建立行程' }}
-            </button>
+            <div class="flex gap-4 pt-4">
+                <button
+                    @click="$emit('cancel')"
+                    :class="[
+                        'flex-grow py-3 font-bold transition-colors',
+                        themeConfig.dialogCancelBtnClass
+                    ]"
+                >
+                    取消
+                </button>
+                <button
+                    @click="handleCreate"
+                    :disabled="isSubmitting"
+                    :class="[
+                        'flex-grow py-3 rounded-xl font-bold transition-all shadow-lg active:scale-95 disabled:opacity-50',
+                        themeConfig.primaryBtnClass
+                    ]"
+                >
+                    {{ isSubmitting ? '建立中...' : '建立行程' }}
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -61,7 +105,8 @@ import { collection, addDoc } from 'firebase/firestore'
 export default {
     props: {
         isDemo: Boolean,
-        user: Object
+        user: Object,
+        themeConfig: Object // 接收全域主題配置
     },
     emits: ['cancel', 'created'],
     data() {
@@ -95,14 +140,12 @@ export default {
                 }
 
                 if (this.isDemo) {
-                    // Demo 模式：儲存至 LocalStorage
                     const data = localStorage.getItem('maplio_demo_data')
                     const trips = data ? JSON.parse(data) : []
                     tripData.id = 'demo_' + Date.now()
                     trips.unshift(tripData)
                     localStorage.setItem('maplio_demo_data', JSON.stringify(trips))
                 } else {
-                    // 線上模式：儲存至 Firebase
                     await addDoc(collection(db, 'trips'), tripData)
                 }
 
@@ -123,8 +166,9 @@ export default {
 </script>
 
 <style scoped>
+/* 日期選擇器的圖示樣式 */
 input[type='date']::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+    filter: v-bind('themeConfig.name === "深色" ? "invert(1)" : "none"');
     opacity: 0.5;
     cursor: pointer;
 }
