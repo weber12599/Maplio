@@ -65,6 +65,50 @@
                 </div>
             </div>
         </div>
+
+        <div v-if="!isLast" class="w-full flex flex-col items-center py-2">
+            <div :class="['w-[2px] h-4 transition-colors', themeConfig.lineClass]"></div>
+
+            <div class="flex items-center gap-3 w-full px-8">
+                <select
+                    v-model="spot.travelMode"
+                    @change="$emit('update-data')"
+                    :class="[
+                        'text-[10px] border rounded-xl px-2 py-1 outline-none font-bold shadow-sm transition-all cursor-pointer',
+                        themeConfig.transportSelectClass
+                    ]"
+                >
+                    <option value="auto">✨ 自動模式</option>
+                    <option value="driving">🚗 點對點開車</option>
+                    <option value="transit">🚌 大眾運輸</option>
+                    <option value="walking">🚶 徒步前往</option>
+                </select>
+
+                <div class="flex-grow text-center overflow-hidden">
+                    <div
+                        @click="$emit('edit-transport', spot)"
+                        class="text-[10px] opacity-50 hover:opacity-100 cursor-pointer py-1 truncate transition-opacity"
+                    >
+                        <span v-if="spot.transStart" class="font-bold mr-2 italic opacity-80">
+                            {{ spot.transStart }}-{{ spot.transEnd }}
+                        </span>
+                        {{ spot.transportNotes || '＋ 交通備註與時間' }}
+                    </div>
+                </div>
+
+                <button
+                    @click="$emit('navigate')"
+                    :class="[
+                        'w-9 h-9 flex items-center justify-center rounded-full border transition-all shadow-sm',
+                        themeConfig.navBtnClass
+                    ]"
+                >
+                    <i class="fa-solid fa-route text-xs"></i>
+                </button>
+            </div>
+
+            <div :class="['w-[2px] h-4 transition-colors', themeConfig.lineClass]"></div>
+        </div>
     </div>
 </template>
 
