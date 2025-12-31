@@ -271,16 +271,11 @@ export default {
             }
         },
         handleSearch(query) {
-            const parsed = parseGoogleMapUrl(query)
-            if (parsed) {
-                this.manualSpot = {
-                    ...parsed,
-                    url: query,
-                    notes: '',
-                    timeStart: '',
-                    timeEnd: '',
-                    showOnMap: true
-                }
+            if (query.startsWith('http')) {
+                const parsed = parseGoogleMapUrl(query)
+                this.manualSpot = parsed
+                    ? { ...parsed, url: query, notes: '', timeStart: '', timeEnd: '' }
+                    : { url: query, notes: '', timeStart: '', timeEnd: '' }
                 this.isEditingExistingSpot = false
                 this.showManualSpotForm = true
             } else {
