@@ -21,7 +21,8 @@ export const themes = {
         dialogContainerClass: 'bg-slate-800 border-slate-700 text-slate-100 shadow-2xl',
         dialogTitleClass: 'text-blue-400',
         dialogLabelClass: 'text-slate-500',
-        dialogInputClass: 'bg-slate-800/50 border-transparent text-white focus:border-blue-500/50',
+        dialogInputClass:
+            'bg-slate-800/50 border-transparent text-white focus:border-blue-500/50 w-full px-2 py-3 rounded-xl text-sm min-w-0',
         dialogSecondaryBtnClass: 'bg-slate-700 text-blue-400 hover:bg-slate-600',
         dialogCancelBtnClass: 'text-slate-500 hover:text-slate-300',
 
@@ -59,7 +60,8 @@ export const themes = {
         dialogContainerClass: 'bg-white border-stone-200 text-stone-800 shadow-2xl',
         dialogTitleClass: 'text-stone-800',
         dialogLabelClass: 'text-stone-400',
-        dialogInputClass: 'bg-white border-stone-200 text-stone-800 focus:border-stone-400',
+        dialogInputClass:
+            'bg-white border-stone-200 text-stone-800 focus:border-stone-400 w-full px-2 py-3 rounded-xl text-sm min-w-0',
         dialogSecondaryBtnClass: 'bg-stone-100 text-stone-600 hover:bg-stone-200',
         dialogCancelBtnClass: 'text-stone-400 hover:text-stone-600',
 

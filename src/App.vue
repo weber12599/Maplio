@@ -619,3 +619,23 @@ export default {
     }
 }
 </style>
+
+<style>
+/* 修正日期、時間、數字輸入框在空值時的高度塌陷問題 */
+input[type='date'],
+input[type='time'],
+input[type='number'] {
+    -webkit-appearance: none;
+    min-width: 0;
+    box-sizing: border-box;
+    /* 新增以下兩行：確保最小高度與一般輸入框一致 */
+    min-height: 2.75rem; /* 約 44px，與 py-3 的高度相符 */
+    line-height: 1.25rem;
+}
+
+/* 針對 iOS 額外處理，確保內容垂直置中 */
+input[type='date'] {
+    display: flex;
+    align-items: center;
+}
+</style>
