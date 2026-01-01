@@ -16,6 +16,13 @@
                     <i class="fa-solid fa-plane-departure text-4xl text-white"></i>
                 </div>
                 <h1 class="text-4xl font-black tracking-tight italic">Maplio</h1>
+
+                <p
+                    v-if="appVersion"
+                    class="text-[10px] font-mono opacity-20 mt-2 uppercase tracking-[0.2em]"
+                >
+                    {{ appVersion }}
+                </p>
             </div>
 
             <div class="space-y-4">

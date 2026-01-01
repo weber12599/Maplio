@@ -10,6 +10,7 @@
             <h1
                 class="text-xl md:text-2xl font-bold cursor-pointer tracking-tight"
                 @click="$emit('back')"
+                @contextmenu.prevent="showVersionInfo"
             >
                 Maplio
             </h1>
@@ -29,11 +30,6 @@
                 </option>
             </select>
 
-            <span
-                v-if="isDemo"
-                class="text-[9px] bg-amber-500/10 text-amber-500 px-1.5 py-0.5 rounded border border-amber-500/20 font-black uppercase"
-                >Demo Mode</span
-            >
             <span v-if="currentTrip" class="hidden md:block opacity-20">/</span>
             <span
                 v-if="currentTrip"
@@ -85,9 +81,24 @@
 import { themes } from '../../utils/themeUtils'
 export default {
     emits: ['back', 'update-theme', 'logout', 'import', 'share', 'create'],
-    props: ['user', 'currentTrip', 'isDemo', 'showAddButton', 'currentTheme', 'themeClass'],
+    props: [
+        'user',
+        'currentTrip',
+        'isDemo',
+        'showAddButton',
+        'currentTheme',
+        'themeClass',
+        'appVersion'
+    ],
     data() {
         return { themeOptions: themes }
+    },
+    methods: {
+        showVersionInfo() {
+            alert(
+                `Maplio 版本資訊\n當前版本: ${this.appVersion || '未知'}\n環境: ${this.isDemo ? 'Demo 模式' : '雲端同步模式'}`
+            )
+        }
     }
 }
 </script>

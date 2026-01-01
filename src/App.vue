@@ -21,6 +21,7 @@
                 :showAddButton="!currentTrip && !showCreateForm"
                 :currentTheme="activeTheme"
                 :themeClass="activeThemeConfig.headerClass"
+                :appVersion="appVersion"
                 @logout="logout"
                 @back="backToList"
                 @create="showCreateForm = true"
@@ -233,7 +234,7 @@ export default {
             editingTransportSpot: null,
             showShareDialog: false,
             activeTheme: localStorage.getItem('maplio_theme') || 'dark',
-            appVersion: import.meta.env.VITE_APP_VERSION || 'v1.2.0'
+            appVersion: import.meta.env.VITE_APP_VERSION || 'v0.0.0'
         }
     },
     computed: {
