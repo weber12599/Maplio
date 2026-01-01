@@ -39,7 +39,7 @@ export const themes = {
     },
     muji: {
         name: '淺色',
-        appClass: 'bg-[#F7F6F2] text-stone-800',
+        appClass: 'bg-white text-stone-800',
         headerClass: 'bg-white border-stone-200 text-stone-800',
         sidebarClass: 'bg-white border-stone-200',
         cardClass: 'bg-white border-stone-200 text-stone-800 shadow-sm',

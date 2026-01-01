@@ -219,8 +219,13 @@ export default {
         }
     },
     watch: {
-        activeTheme(val) {
-            localStorage.setItem('maplio_theme', val)
+        activeTheme: {
+            handler(newTheme) {
+                localStorage.setItem('maplio_theme', newTheme)
+                this.updateBodyClass()
+            },
+            immediate: true,
+            deep: false
         }
     },
     mounted() {
@@ -230,8 +235,19 @@ export default {
                 this.unsubscribe = subscribeTrips(user.uid, (data) => (this.trips = data))
             }
         })
+        this.updateBodyClass()
     },
     methods: {
+        updateBodyClass() {
+            const body = document.body
+            Object.values(themes).forEach((config) => {
+                const classes = config.appClass.split(' ')
+                body.classList.remove(...classes)
+            })
+            const activeClasses = this.activeThemeConfig.appClass.split(' ')
+            body.classList.add(...activeClasses)
+            body.classList.add('transition-colors', 'duration-500')
+        },
         async handleGoogleLogin() {
             try {
                 await signInWithPopup(auth, googleProvider)
