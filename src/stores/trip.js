@@ -16,6 +16,7 @@ export const useTripStore = defineStore('trip', () => {
     const currentTrip = ref(null)
     const activeDay = ref(0)
     const unsubscribeSnapshot = ref(null)
+    const isTripsLoading = ref(false)
 
     const currentDaySpots = computed(() => {
         return currentTrip.value?.itinerary[activeDay.value]?.spots || []
@@ -25,20 +26,35 @@ export const useTripStore = defineStore('trip', () => {
         if (authStore.isDemoMode) {
             const data = localStorage.getItem('maplio_demo_data')
             trips.value = data ? JSON.parse(data) : []
+            isTripsLoading.value = false
             return
         }
 
         if (authStore.user) {
-            if (unsubscribeSnapshot.value) unsubscribeSnapshot.value()
+            if (unsubscribeSnapshot.value) return
+
+            isTripsLoading.value = true
+            trips.value = []
 
             unsubscribeSnapshot.value = subscribeTrips(authStore.user.uid, (data) => {
                 trips.value = data
+                isTripsLoading.value = false
+
                 if (currentTrip.value) {
                     const found = data.find((t) => t.id === currentTrip.value.id)
                     if (found) currentTrip.value = found
                 }
             })
         }
+    }
+
+    function stopTripsListener() {
+        if (unsubscribeSnapshot.value) {
+            unsubscribeSnapshot.value()
+            unsubscribeSnapshot.value = null
+        }
+        trips.value = []
+        isTripsLoading.value = false
     }
 
     async function checkAndJoinTrip(tripId) {
@@ -130,7 +146,9 @@ export const useTripStore = defineStore('trip', () => {
         currentTrip,
         activeDay,
         currentDaySpots,
+        isTripsLoading,
         initTripsListener,
+        stopTripsListener,
         checkAndJoinTrip,
         selectTrip,
         saveData,
