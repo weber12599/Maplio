@@ -22,7 +22,12 @@ export default {
         currentTheme: String
     },
     data() {
-        return { map: null, markers: [], tileLayer: null }
+        return {}
+    },
+    created() {
+        this.map = null
+        this.markers = []
+        this.tileLayer = null
     },
     watch: {
         spots: {
@@ -39,7 +44,11 @@ export default {
         this.initMap()
     },
     beforeUnmount() {
-        if (this.map) this.map.remove()
+        if (this.map) {
+            this.markers.forEach((m) => m.remove()) // 確保標記與 Tooltip 被移除
+            this.map.remove()
+            this.map = null
+        }
     },
     methods: {
         initMap() {
