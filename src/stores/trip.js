@@ -141,6 +141,21 @@ export const useTripStore = defineStore('trip', () => {
         saveData()
     }
 
+    function updateCurrentDayMeta(metaData) {
+        if (!currentTrip.value) return
+
+        // 取得當前天數物件
+        const dayObj = currentTrip.value.itinerary[activeDay.value]
+
+        // 更新欄位 (使用合併方式以保留 spots)
+        currentTrip.value.itinerary[activeDay.value] = {
+            ...dayObj,
+            ...metaData
+        }
+
+        saveData()
+    }
+
     return {
         trips,
         currentTrip,
@@ -156,6 +171,7 @@ export const useTripStore = defineStore('trip', () => {
         addLocalTrip,
         addDay,
         removeDay,
-        updateCurrentDaySpots
+        updateCurrentDaySpots,
+        updateCurrentDayMeta
     }
 })

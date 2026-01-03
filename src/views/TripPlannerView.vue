@@ -21,11 +21,65 @@
                 activeThemeConfig.sidebarClass
             ]"
         >
-            <div class="block md:hidden h-[220px] w-full shrink-0 border-b border-stone-200/50">
+            <div
+                class="block md:hidden h-[220px] w-full shrink-0 border-b border-stone-200/50 relative group"
+            >
+                <div
+                    class="absolute top-2 right-2 z-[9999] bg-white/90 backdrop-blur rounded-md shadow-sm border border-stone-200 p-1 flex gap-1"
+                >
+                    <button
+                        @click="viewMode = 'map'"
+                        title="地圖"
+                        :class="[
+                            'w-8 h-8 flex items-center justify-center rounded text-sm transition-colors',
+                            viewMode === 'map'
+                                ? 'bg-stone-800 text-white shadow-sm'
+                                : 'text-stone-400 hover:bg-stone-100'
+                        ]"
+                    >
+                        <i class="fa-solid fa-map"></i>
+                    </button>
+                    <button
+                        @click="viewMode = 'summary'"
+                        title="摘要"
+                        :class="[
+                            'w-8 h-8 flex items-center justify-center rounded text-sm transition-colors',
+                            viewMode === 'summary'
+                                ? 'bg-stone-800 text-white shadow-sm'
+                                : 'text-stone-400 hover:bg-stone-100'
+                        ]"
+                    >
+                        <i class="fa-solid fa-align-left"></i>
+                    </button>
+                    <button
+                        @click="viewMode = 'todo'"
+                        title="待辦事項"
+                        :class="[
+                            'w-8 h-8 flex items-center justify-center rounded text-sm transition-colors',
+                            viewMode === 'todo'
+                                ? 'bg-stone-800 text-white shadow-sm'
+                                : 'text-stone-400 hover:bg-stone-100'
+                        ]"
+                    >
+                        <i class="fa-solid fa-list-check"></i>
+                    </button>
+                </div>
+
                 <LeafletMap
+                    v-show="viewMode === 'map'"
                     mapId="mobile-map"
                     :spots="tripStore.currentDaySpots"
                     :currentTheme="themeStore.activeTheme"
+                    class="w-full h-full"
+                />
+
+                <DayInfo
+                    v-if="viewMode === 'summary' || viewMode === 'todo'"
+                    :mode="viewMode"
+                    :summary="currentDayMeta.summary"
+                    :todos="currentDayMeta.todos"
+                    :themeConfig="activeThemeConfig"
+                    @update="handleMetaUpdate"
                 />
             </div>
 
@@ -103,12 +157,54 @@
             </div>
         </aside>
 
-        <LeafletMap
-            mapId="desktop-map"
-            :spots="tripStore.currentDaySpots"
-            :currentTheme="themeStore.activeTheme"
-            class="hidden md:block"
-        />
+        <div class="hidden md:flex relative flex-grow h-full flex-col overflow-hidden bg-stone-50">
+            <div
+                class="absolute top-4 right-4 z-[9999] bg-white rounded-lg shadow-md p-1 flex items-center border border-stone-200"
+            >
+                <button
+                    @click="viewMode = 'map'"
+                    :class="[
+                        'px-3 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2',
+                        viewMode === 'map'
+                            ? 'bg-stone-800 text-white shadow-sm'
+                            : 'text-stone-500 hover:bg-stone-100'
+                    ]"
+                >
+                    <i class="fa-solid fa-map"></i>
+                    <span class="hidden lg:inline">地圖</span>
+                </button>
+                <button
+                    @click="viewMode = 'info'"
+                    :class="[
+                        'px-3 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2',
+                        // 如果現在是 summary 或 todo 模式，桌機版也視為 info 模式 active
+                        viewMode !== 'map'
+                            ? 'bg-stone-800 text-white shadow-sm'
+                            : 'text-stone-500 hover:bg-stone-100'
+                    ]"
+                >
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <span class="hidden lg:inline">筆記</span>
+                </button>
+            </div>
+
+            <LeafletMap
+                v-show="viewMode === 'map'"
+                mapId="desktop-map"
+                :spots="tripStore.currentDaySpots"
+                :currentTheme="themeStore.activeTheme"
+                class="flex-grow w-full h-full"
+            />
+
+            <DayInfo
+                v-if="viewMode !== 'map'"
+                mode="all"
+                :summary="currentDayMeta.summary"
+                :todos="currentDayMeta.todos"
+                :themeConfig="activeThemeConfig"
+                @update="handleMetaUpdate"
+            />
+        </div>
 
         <SpotDialog
             v-if="showManualSpotForm"
@@ -117,7 +213,6 @@
             @cancel="showManualSpotForm = false"
             @confirm="addManualSpot"
         />
-
         <TransportDialog
             v-if="showTransportDialog"
             v-model="editingTransportSpot"
@@ -125,7 +220,6 @@
             @cancel="showTransportDialog = false"
             @confirm="updateTransportInfo"
         />
-
         <CopySpotDialog
             :isOpen="showCopyDialog"
             :totalDays="tripStore.currentTrip?.itinerary.length || 0"
@@ -134,7 +228,6 @@
             @close="showCopyDialog = false"
             @confirm="executeCopySpot"
         />
-
         <ShareDialog
             v-if="showShareDialog"
             :themeConfig="activeThemeConfig"
@@ -149,6 +242,7 @@
 </template>
 
 <script setup>
+// Script setup 內容與之前相同，不需要更動
 import { ref, computed, defineExpose, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
@@ -163,6 +257,7 @@ import LeafletMap from '../components/Map/LeafletMap.vue'
 import TransportDialog from '../components/Planner/TransportDialog.vue'
 import CopySpotDialog from '../components/Planner/CopySpotDialog.vue'
 import ShareDialog from '../components/Trip/ShareDialog.vue'
+import DayInfo from '../components/Planner/DayInfo.vue'
 
 import { useThemeStore } from '../stores/theme'
 import { useTripStore } from '../stores/trip'
@@ -189,10 +284,26 @@ const isSearching = ref(false)
 const isEditingExistingSpot = ref(false)
 const searchBar = ref(null)
 
+// 視圖模式: 'map', 'summary', 'todo', 'info'
+const viewMode = ref('map')
+
 const currentDaySpotsWritable = computed({
     get: () => tripStore.currentDaySpots,
     set: (val) => tripStore.updateCurrentDaySpots(val)
 })
+
+const currentDayMeta = computed(() => {
+    if (!tripStore.currentTrip) return { summary: '', todos: [] }
+    const day = tripStore.currentTrip.itinerary[tripStore.activeDay]
+    return {
+        summary: day.summary || '',
+        todos: day.todos || []
+    }
+})
+
+const handleMetaUpdate = (newData) => {
+    tripStore.updateCurrentDayMeta(newData)
+}
 
 const loadTrip = async (id) => {
     if (!id) return
@@ -213,9 +324,7 @@ onMounted(() => {
 watch(
     () => route.params.id,
     (newId) => {
-        if (newId) {
-            loadTrip(newId)
-        }
+        if (newId) loadTrip(newId)
     }
 )
 
