@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full flex flex-col bg-stone-50 relative overflow-hidden">
+    <div :class="['h-full flex flex-col relative overflow-hidden', themeConfig.appClass]">
         <div
             class="flex-grow overflow-y-auto p-4 md:p-8 max-w-3xl mx-auto w-full z-10 space-y-4 md:space-y-8"
         >
@@ -7,7 +7,7 @@
                 <h3
                     :class="[
                         'text-lg font-bold flex items-center gap-2',
-                        themeConfig.textClass || 'text-stone-700'
+                        themeConfig.dialogTitleClass
                     ]"
                 >
                     <i class="fa-solid fa-align-left opacity-60"></i>
@@ -17,17 +17,20 @@
                     v-model="localSummary"
                     @input="handleSummaryInput"
                     placeholder="紀錄本日重點，例如：天氣預報、穿搭建議、總預算..."
-                    class="w-full h-32 p-4 rounded-xl border border-stone-200 bg-white focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none resize-none transition-all text-stone-700 leading-relaxed shadow-sm"
+                    :class="[
+                        'w-full h-32 p-4 rounded-xl outline-none resize-none transition-all shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent',
+                        themeConfig.inputClass
+                    ]"
                 ></textarea>
             </section>
 
-            <hr v-if="mode === 'all'" class="border-stone-200" />
+            <hr v-if="mode === 'all'" :class="['border-0 h-px', themeConfig.lineClass]" />
 
             <section v-if="mode === 'all' || mode === 'todo'" class="space-y-4">
                 <h3
                     :class="[
                         'text-lg font-bold flex items-center gap-2',
-                        themeConfig.textClass || 'text-stone-700'
+                        themeConfig.dialogTitleClass
                     ]"
                 >
                     <i class="fa-solid fa-list-check opacity-60"></i>
@@ -40,11 +43,17 @@
                         @keyup.enter="addTodo"
                         type="text"
                         placeholder="新增待辦事項 (按 Enter 新增)"
-                        class="flex-grow px-4 py-2 rounded-lg border border-stone-200 bg-white focus:outline-none focus:border-blue-400 transition-colors"
+                        :class="[
+                            'flex-grow px-4 py-2 rounded-lg focus:outline-none focus:border-blue-400 transition-colors',
+                            themeConfig.inputClass
+                        ]"
                     />
                     <button
                         @click="addTodo"
-                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                        :class="[
+                            'px-4 py-2 rounded-lg transition-colors',
+                            themeConfig.primaryBtnClass
+                        ]"
                     >
                         <i class="fa-solid fa-plus"></i>
                     </button>
@@ -56,17 +65,20 @@
                         :key="index"
                         :class="[
                             'group flex items-center gap-3 p-3 rounded-lg border transition-all duration-300',
-                            todo.done
-                                ? 'bg-stone-100 border-transparent opacity-60'
-                                : 'bg-white border-stone-200 shadow-sm hover:border-blue-300',
-                            todo.level === 1 ? 'ml-8 border-l-4 border-l-stone-300' : ''
+                            todo.done ? 'opacity-60' : '',
+                            todo.level === 1 ? 'ml-8 border-l-4' : '',
+                            // 使用 cardClass 作為列表項目樣式
+                            themeConfig.cardClass
                         ]"
+                        :style="todo.level === 1 ? { borderLeftColor: 'currentColor' } : {}"
                     >
                         <div
                             @click="toggleTodo(index)"
                             class="cursor-pointer text-xl min-w-[24px]"
                             :class="
-                                todo.done ? 'text-blue-500' : 'text-stone-300 hover:text-blue-400'
+                                todo.done
+                                    ? 'text-blue-500'
+                                    : themeConfig.dialogLabelClass || 'text-slate-400'
                             "
                         >
                             <i
@@ -78,7 +90,7 @@
 
                         <span
                             class="flex-grow select-none cursor-pointer"
-                            :class="todo.done ? 'line-through text-stone-400' : 'text-stone-700'"
+                            :class="todo.done ? 'line-through opacity-60' : ''"
                             @click="toggleTodo(index)"
                         >
                             {{ todo.text }}
@@ -90,7 +102,10 @@
                             <button
                                 v-if="todo.level === 0"
                                 @click="setIndent(index, 1)"
-                                class="w-7 h-7 flex items-center justify-center rounded hover:bg-stone-100 text-stone-400"
+                                :class="[
+                                    'w-7 h-7 flex items-center justify-center rounded hover:bg-slate-500/10',
+                                    themeConfig.dialogLabelClass
+                                ]"
                                 title="縮排"
                             >
                                 <i class="fa-solid fa-indent"></i>
@@ -98,14 +113,17 @@
                             <button
                                 v-if="todo.level === 1"
                                 @click="setIndent(index, 0)"
-                                class="w-7 h-7 flex items-center justify-center rounded hover:bg-stone-100 text-stone-400"
+                                :class="[
+                                    'w-7 h-7 flex items-center justify-center rounded hover:bg-slate-500/10',
+                                    themeConfig.dialogLabelClass
+                                ]"
                                 title="取消縮排"
                             >
                                 <i class="fa-solid fa-outdent"></i>
                             </button>
                             <button
                                 @click="removeTodo(index)"
-                                class="w-7 h-7 flex items-center justify-center rounded hover:bg-red-50 text-stone-300 hover:text-red-500"
+                                class="w-7 h-7 flex items-center justify-center rounded hover:bg-red-500/10 text-stone-300 hover:text-red-500"
                             >
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -114,7 +132,10 @@
                 </ul>
                 <div
                     v-if="localTodos.length === 0"
-                    class="text-center py-8 text-stone-400 text-sm italic"
+                    :class="[
+                        'text-center py-8 text-sm italic',
+                        themeConfig.dialogLabelClass || 'text-stone-400'
+                    ]"
                 >
                     尚無待辦事項
                 </div>
@@ -130,7 +151,6 @@ const props = defineProps({
     summary: String,
     todos: Array,
     themeConfig: Object,
-    // [新增] 顯示模式: 'all' | 'summary' | 'todo'
     mode: {
         type: String,
         default: 'all'
