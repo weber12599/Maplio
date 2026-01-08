@@ -9,6 +9,7 @@
             <button
                 v-for="(day, index) in itinerary"
                 :key="index"
+                :id="`day-tab-${index}`"
                 @click="$emit('update:activeDay', index)"
                 :class="[
                     'px-5 py-2 rounded-2xl text-sm font-black whitespace-nowrap flex flex-col items-center min-w-[85px] transition-all duration-300',
@@ -42,6 +43,24 @@ export default {
     methods: {
         formatDate(idx) {
             return getDayDate(this.startDate, idx)
+        }
+    },
+    watch: {
+        activeDay: {
+            async handler(newVal) {
+                this.$nextTick(() => {
+                    const activeTab = document.getElementById(`day-tab-${newVal}`)
+                    if (activeTab) {
+                        activeTab.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest',
+                            inline: 'center'
+                        })
+                    }
+                })
+            },
+            immediate: true,
+            deep: false
         }
     }
 }

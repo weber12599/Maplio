@@ -95,72 +95,83 @@
                 @delete-day="tripStore.removeDay"
             />
 
-            <div
-                class="flex-grow overflow-y-auto no-scrollbar p-6 space-y-8 pb-32"
-                @touchstart="handleTouchStart"
-                @touchend="handleTouchEnd"
-            >
-                <SearchBar
-                    ref="searchBar"
-                    :loading="isSearching"
-                    :results="searchResults"
-                    :themeConfig="activeThemeConfig"
-                    @search="handleSearch"
-                    @select="handleLocationSelect"
-                />
-
-                <draggable
-                    v-model="currentDaySpotsWritable"
-                    group="spots"
-                    item-key="id"
-                    handle=".drag-handle"
-                >
-                    <template #item="{ element, index }">
-                        <SpotItem
-                            :spot="element"
-                            :nextSpot="tripStore.currentDaySpots[index + 1]"
-                            :isLast="index === tripStore.currentDaySpots.length - 1"
-                            :themeConfig="activeThemeConfig"
-                            @edit="startEditSpot"
-                            @copy="initiateCopySpot"
-                            @remove="handleRemoveSpot(index)"
-                            @open-map="openSpotOnMaps"
-                            @update-data="tripStore.saveData"
-                            @edit-transport="startEditTransport"
-                            @navigate="
-                                handleNavigate(element, tripStore.currentDaySpots[index + 1])
-                            "
-                        />
-                    </template>
-                </draggable>
-
-                <div
-                    v-if="tripStore.currentDaySpots.length === 0"
-                    :class="[
-                        'text-center py-20 border-2 border-dashed rounded-[3rem] opacity-30',
-                        activeThemeConfig.secondaryBorderClass
-                    ]"
-                >
-                    <p class="text-sm font-bold">今天還沒安排行程，試試搜尋景點吧！</p>
-                </div>
-
-                <div
-                    v-if="tripStore.currentTrip && tripStore.currentTrip.itinerary.length > 1"
-                    class="flex justify-center pt-8"
-                >
-                    <button
-                        @click="tripStore.removeDay"
-                        :class="[
-                            'text-xs font-bold transition-all flex items-center gap-2 py-2 px-4 rounded-xl border opacity-40 hover:opacity-100',
-                            themeStore.activeTheme === 'muji'
-                                ? 'border-stone-200 text-stone-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50'
-                                : 'border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-900/50 hover:bg-red-900/10'
-                        ]"
+            <div class="relative flex-grow overflow-hidden bg-stone-50">
+                <Transition :name="transitionName">
+                    <div
+                        :key="tripStore.activeDay"
+                        class="absolute inset-0 overflow-y-auto no-scrollbar p-6 space-y-8 pb-32 w-full"
+                        @touchstart="handleTouchStart"
+                        @touchend="handleTouchEnd"
                     >
-                        <i class="fa-solid fa-trash-can"></i>
-                        刪除 Day {{ tripStore.activeDay + 1 }} 整天行程
-                    </button>
-                </div>
+                        <SearchBar
+                            ref="searchBar"
+                            :loading="isSearching"
+                            :results="searchResults"
+                            :themeConfig="activeThemeConfig"
+                            @search="handleSearch"
+                            @select="handleLocationSelect"
+                        />
+
+                        <draggable
+                            v-model="currentDaySpotsWritable"
+                            group="spots"
+                            item-key="id"
+                            handle=".drag-handle"
+                            class="space-y-4"
+                        >
+                            <template #item="{ element, index }">
+                                <SpotItem
+                                    :spot="element"
+                                    :nextSpot="tripStore.currentDaySpots[index + 1]"
+                                    :isLast="index === tripStore.currentDaySpots.length - 1"
+                                    :themeConfig="activeThemeConfig"
+                                    @edit="startEditSpot"
+                                    @copy="initiateCopySpot"
+                                    @remove="handleRemoveSpot(index)"
+                                    @open-map="openSpotOnMaps"
+                                    @update-data="tripStore.saveData"
+                                    @edit-transport="startEditTransport"
+                                    @navigate="
+                                        handleNavigate(
+                                            element,
+                                            tripStore.currentDaySpots[index + 1]
+                                        )
+                                    "
+                                />
+                            </template>
+                        </draggable>
+
+                        <div
+                            v-if="tripStore.currentDaySpots.length === 0"
+                            :class="[
+                                'text-center py-20 border-2 border-dashed rounded-[3rem] opacity-30',
+                                activeThemeConfig.secondaryBorderClass
+                            ]"
+                        >
+                            <p class="text-sm font-bold">今天還沒安排行程，試試搜尋景點吧！</p>
+                        </div>
+
+                        <div
+                            v-if="
+                                tripStore.currentTrip && tripStore.currentTrip.itinerary.length > 1
+                            "
+                            class="flex justify-center pt-8"
+                        >
+                            <button
+                                @click="tripStore.removeDay"
+                                :class="[
+                                    'text-xs font-bold transition-all flex items-center gap-2 py-2 px-4 rounded-xl border opacity-40 hover:opacity-100',
+                                    themeStore.activeTheme === 'muji'
+                                        ? 'border-stone-200 text-stone-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50'
+                                        : 'border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-900/50 hover:bg-red-900/10'
+                                ]"
+                            >
+                                <i class="fa-solid fa-trash-can"></i>
+                                刪除 Day {{ tripStore.activeDay + 1 }} 整天行程
+                            </button>
+                        </div>
+                    </div>
+                </Transition>
             </div>
         </aside>
 
@@ -293,6 +304,7 @@ const searchResults = ref([])
 const isSearching = ref(false)
 const isEditingExistingSpot = ref(false)
 const searchBar = ref(null)
+const transitionName = ref('slide-left')
 
 // 視圖模式: 'map', 'summary', 'todo', 'info'
 const viewMode = ref('map')
@@ -343,6 +355,13 @@ watch(user, (newUser) => {
         loadTrip(route.params.id)
     }
 })
+
+watch(
+    () => tripStore.activeDay,
+    (newVal, oldVal) => {
+        transitionName.value = newVal > oldVal ? 'slide-left' : 'slide-right'
+    }
+)
 
 const handleSearch = (query) => {
     if (query.startsWith('http')) {
@@ -563,3 +582,37 @@ defineExpose({
     openShareDialog
 })
 </script>
+
+<style scoped>
+/* 向左滑 (下一頁) */
+.slide-left-enter-active,
+.slide-left-leave-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-left-enter-from {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.slide-left-leave-to {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+/* 向右滑 (上一頁) */
+.slide-right-enter-active,
+.slide-right-leave-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-right-enter-from {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.slide-right-leave-to {
+    transform: translateX(100%);
+    opacity: 0;
+}
+</style>
