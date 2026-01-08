@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="flex-grow min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex items-center gap-2">
                         <input
                             type="checkbox"
                             v-model="spot.showOnMap"
@@ -44,6 +44,18 @@
                                 >Web</span
                             >
                         </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span
+                            v-if="spot.timeStart || spot.timeEnd"
+                            :class="[
+                                'text-[9px] px-2 py-0.5 rounded-md font-bold italic',
+                                themeConfig.badgeClass
+                            ]"
+                        >
+                            {{ spot.timeStart }} - {{ spot.timeEnd }}
+                        </span>
 
                         <button
                             @click="$emit('copy', spot)"
@@ -60,18 +72,6 @@
                         >
                             <i class="fa-solid fa-pen-to-square text-[11px]"></i>
                         </button>
-                    </div>
-
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span
-                            v-if="spot.timeStart || spot.timeEnd"
-                            :class="[
-                                'text-[9px] px-2 py-0.5 rounded-md font-bold italic',
-                                themeConfig.badgeClass
-                            ]"
-                        >
-                            {{ spot.timeStart }} - {{ spot.timeEnd }}
-                        </span>
                     </div>
 
                     <div v-if="spot.notes" class="w-full mt-2">
@@ -124,7 +124,7 @@
                     v-model="spot.travelMode"
                     @change="$emit('update-data')"
                     :class="[
-                        'text-[10px] border rounded-xl px-2 py-1 outline-none font-bold shadow-sm transition-all cursor-pointer',
+                        'text-[10px] border rounded-xl px-2 py-1 outline-none font-bold shadow-sm transition-all cursor-pointer w-11 md:w-auto',
                         themeConfig.transportSelectClass
                     ]"
                 >
@@ -166,7 +166,7 @@
                                 </a>
                                 <div
                                     v-else
-                                    class="opacity-80 leading-relaxed overflow-hidden text-ellipsis"
+                                    class="opacity-80 leading-relaxed overflow-hidden text-wrap"
                                 >
                                     {{ note }}
                                 </div>
@@ -190,7 +190,7 @@
                     :disabled="!canNavigate"
                     @click="canNavigate && $emit('navigate')"
                     :class="[
-                        'w-8 h-8 rounded-full flex items-center justify-center transition-all',
+                        'w-8 h-8 rounded-full flex items-center justify-center transition-all shrink-0',
                         themeConfig.navBtnClass,
                         !canNavigate
                             ? 'opacity-20 cursor-not-allowed grayscale'
