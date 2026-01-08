@@ -92,7 +92,11 @@
                 @delete-day="tripStore.removeDay"
             />
 
-            <div class="flex-grow overflow-y-auto no-scrollbar p-6 space-y-8 pb-32">
+            <div
+                class="flex-grow overflow-y-auto no-scrollbar p-6 space-y-8 pb-32"
+                @touchstart="handleTouchStart"
+                @touchend="handleTouchEnd"
+            >
                 <SearchBar
                     ref="searchBar"
                     :loading="isSearching"
@@ -515,6 +519,37 @@ const executeShare = async (label, content, isText) => {
         alert(`${label} 已複製到剪貼簿！`)
     } catch (err) {
         alert('複製失敗')
+    }
+}
+
+// Swipe
+const touchStartX = ref(0)
+const touchStartY = ref(0)
+
+const handleTouchStart = (e) => {
+    touchStartX.value = e.changedTouches[0].screenX
+    touchStartY.value = e.changedTouches[0].screenY
+}
+
+const handleTouchEnd = (e) => {
+    const touchEndX = e.changedTouches[0].screenX
+    const touchEndY = e.changedTouches[0].screenY
+
+    const diffX = touchEndX - touchStartX.value
+    const diffY = touchEndY - touchStartY.value
+
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+        const maxDay = tripStore.currentTrip?.itinerary?.length - 1 || 0
+
+        if (diffX > 0) {
+            if (tripStore.activeDay > 0) {
+                tripStore.activeDay--
+            }
+        } else {
+            if (tripStore.activeDay < maxDay) {
+                tripStore.activeDay++
+            }
+        }
     }
 }
 
