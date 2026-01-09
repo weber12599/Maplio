@@ -9,17 +9,24 @@
             <div>
                 <div
                     :class="[
-                        'inline-flex items-center justify-center w-24 h-24 rounded-[2.5rem] mb-6 shadow-2xl transition-all duration-500',
-                        themeConfig.primaryBtnClass
+                        'inline-flex items-center justify-center w-24 h-24 mb-6 transition-all duration-500'
                     ]"
                 >
-                    <i class="fa-solid fa-plane-departure text-4xl text-white"></i>
+                    <div
+                        class="inline-flex items-center justify-center w-24 h-24 mb-4 transition-all duration-500"
+                    >
+                        <img
+                            src="/logos/favicon.svg"
+                            alt="Maplio Logo"
+                            class="w-full h-full object-contain drop-shadow-2xl"
+                        />
+                    </div>
                 </div>
                 <h1 class="text-4xl font-black tracking-tight italic">Maplio</h1>
 
                 <p
                     v-if="appVersion"
-                    class="text-[10px] font-mono opacity-20 mt-2 uppercase tracking-[0.2em]"
+                    class="text-[10px] font-mono opacity-50 mt-2 uppercase tracking-[0.2em]"
                 >
                     {{ appVersion }}
                 </p>
@@ -43,7 +50,7 @@
                 <button
                     @click="$emit('demo')"
                     :class="[
-                        'w-full py-4 rounded-2xl font-bold border transition-all active:scale-95 group',
+                        'w-full py-4 rounded-2xl font-bold transition-all shadow-sm active:scale-95 group',
                         themeConfig.googleBtnClass
                     ]"
                 >

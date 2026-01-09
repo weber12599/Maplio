@@ -37,7 +37,7 @@ export const themes = {
         badgeClass: 'bg-blue-500/10 text-blue-400',
         tabActiveClass: 'bg-blue-600 text-white shadow-blue-600/30',
         tabInactiveClass: 'bg-slate-800 text-slate-500 hover:text-slate-300',
-        googleBtnClass: 'bg-white text-slate-900',
+        googleBtnClass: 'bg-slate-700 text-white hover:bg-slate-600',
         secondaryBorderClass: 'border-slate-700',
         mapTile: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
     },
