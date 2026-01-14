@@ -61,7 +61,27 @@ export const useTripStore = defineStore('trip', () => {
     }
 
     async function checkAndJoinTrip(tripId) {
-        if (!tripId || authStore.isDemoMode || !authStore.user) return
+        if (!tripId) return
+
+        if (authStore.isDemoMode) {
+            if (trips.value.length === 0) {
+                const data = localStorage.getItem('maplio_demo_data')
+                if (data) {
+                    trips.value = JSON.parse(data)
+                }
+            }
+
+            const existing = trips.value.find((t) => t.id === tripId)
+            if (existing) {
+                selectTrip(tripId)
+            } else {
+                console.warn('Demo trip not found:', tripId)
+                currentTrip.value = null
+            }
+            return
+        }
+
+        if (!authStore.user) return
 
         const existing = trips.value.find((t) => t.id === tripId)
         if (existing) {
