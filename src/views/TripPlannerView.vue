@@ -543,7 +543,7 @@ const handleShareChoice = async (choice) => {
 const executeShare = async (label, content, isText) => {
     const title = t('planner.share_title', { label, tripName: tripStore.currentTrip.name })
 
-    if (navigator.share) {
+    if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
         try {
             await navigator.share({ title, [isText ? 'text' : 'url']: content })
             return
