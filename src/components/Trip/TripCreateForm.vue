@@ -102,7 +102,6 @@
 import { db } from '../../firebase'
 import { collection, addDoc } from 'firebase/firestore'
 import { useTripStore } from '../../stores/trip'
-import { useThemeStore } from '../../stores/theme'
 import { useI18n } from 'vue-i18n'
 
 export default {
@@ -114,9 +113,8 @@ export default {
     emits: ['cancel', 'created'],
     setup() {
         const tripStore = useTripStore()
-        const themeStore = useThemeStore()
         const { t } = useI18n()
-        return { tripStore, themeStore, t }
+        return { tripStore, t }
     },
     data() {
         return {
@@ -170,12 +168,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-input[type='date']::-webkit-calendar-picker-indicator,
-input[type='time']::-webkit-calendar-picker-indicator {
-    filter: v-bind('themeStore.currentTheme === "dark" ? "invert(1)" : "none"');
-    opacity: 0.5;
-    cursor: pointer;
-}
-</style>

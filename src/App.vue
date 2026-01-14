@@ -163,4 +163,16 @@ input[type='date'] {
     display: flex;
     align-items: center;
 }
+
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='time']::-webkit-calendar-picker-indicator {
+    filter: v-bind('themeStore.activeTheme === "dark" ? "invert(1)" : "none"');
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator:hover,
+input[type='time']::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
 </style>
