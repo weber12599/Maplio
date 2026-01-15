@@ -27,7 +27,8 @@ export default {
             renderTimeout: null,
             resizeTimeout: null,
             renderDelay: 300,
-            resizeDelay: 200
+            resizeDelay: 200,
+            resizeObserver: null
         }
     },
     created() {
@@ -54,8 +55,26 @@ export default {
         this.initMap()
     },
     beforeUnmount() {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect()
+            this.resizeObserver = null
+        }
+
+        if (this.renderTimeout) {
+            clearTimeout(this.renderTimeout)
+        }
+        if (this.resizeTimeout) {
+            clearTimeout(this.resizeTimeout)
+        }
+
         if (this.map) {
             this.markers.forEach((m) => m.remove())
+            this.markers = []
+
+            if (this.tileLayer) {
+                this.map.removeLayer(this.tileLayer)
+            }
+
             this.map.remove()
             this.map = null
         }
@@ -71,7 +90,7 @@ export default {
                 }).setView([25.03, 121.56], 13)
                 this.updateTileLayer(this.currentTheme)
 
-                const ro = new ResizeObserver(() => {
+                this.resizeObserver = new ResizeObserver(() => {
                     if (this.map) {
                         clearTimeout(this.resizeTimeout)
                         this.resizeTimeout = setTimeout(() => {
@@ -82,7 +101,7 @@ export default {
                         }, this.resizeDelay)
                     }
                 })
-                ro.observe(this.$el)
+                this.resizeObserver.observe(this.$el)
                 this.map.whenReady(() => this.renderMarkers())
             })
         },
