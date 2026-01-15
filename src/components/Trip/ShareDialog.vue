@@ -79,10 +79,15 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: ['themeConfig']
-}
+<script setup>
+defineProps({
+    themeConfig: {
+        type: Object,
+        required: true
+    }
+})
+
+defineEmits(['cancel', 'choice'])
 </script>
 
 <style scoped>
