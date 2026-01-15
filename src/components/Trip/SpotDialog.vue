@@ -176,37 +176,32 @@
     </div>
 </template>
 
-<script>
-import { parseClipboardCoords } from '../../utils/mapUtils'
+<script setup>
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { parseClipboardCoords } from '../../utils/mapUtils'
 
-export default {
-    props: {
-        modelValue: Object,
-        themeConfig: Object
-    },
-    setup() {
-        const { t } = useI18n()
-        return { t }
-    },
-    data() {
-        return {
-            localSpot: JSON.parse(JSON.stringify(this.modelValue))
+const props = defineProps({
+    modelValue: Object,
+    themeConfig: Object
+})
+
+const emit = defineEmits(['cancel', 'confirm'])
+
+const { t } = useI18n()
+
+const localSpot = ref(JSON.parse(JSON.stringify(props.modelValue)))
+
+const handlePaste = async () => {
+    try {
+        const text = await navigator.clipboard.readText()
+        const coords = parseClipboardCoords(text)
+        if (coords) {
+            localSpot.value.lat = coords.lat
+            localSpot.value.lng = coords.lng
         }
-    },
-    methods: {
-        async handlePaste() {
-            try {
-                const text = await navigator.clipboard.readText()
-                const coords = parseClipboardCoords(text)
-                if (coords) {
-                    this.localSpot.lat = coords.lat
-                    this.localSpot.lng = coords.lng
-                }
-            } catch (err) {
-                console.error('Fail to read a valid JSON from clipboard ', err)
-            }
-        }
+    } catch (err) {
+        console.error('Fail to read a valid JSON from clipboard ', err)
     }
 }
 </script>
