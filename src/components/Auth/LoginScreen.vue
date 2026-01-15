@@ -67,17 +67,16 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        themeConfig: {
-            type: Object,
-            required: true
-        },
-        appVersion: String
+<script setup>
+defineProps({
+    themeConfig: {
+        type: Object,
+        required: true
     },
-    emits: ['login', 'demo']
-}
+    appVersion: String
+})
+
+defineEmits(['login', 'demo'])
 </script>
 
 <style scoped>
