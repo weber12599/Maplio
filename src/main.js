@@ -5,6 +5,7 @@ import App from './App.vue'
 import router from './router'
 import i18n from './i18n'
 
+import '@/assets/main.css'
 import faviconUrl from '@/assets/logos/favicon.svg'
 
 const link = document.createElement('link')

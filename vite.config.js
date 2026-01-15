@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => {
             }
         },
         build: {
+            target: ['es2015', 'chrome64', 'safari11'],
             assetsInlineLimit: isOffline ? 100000000 : 4096
         }
     }
