@@ -9,6 +9,17 @@ import {
     joinTrip as joinTripService
 } from '../services/tripService'
 
+function debounce(fn, delay) {
+    let timeoutId = null
+    return (...args) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId)
+        }
+
+        timeoutId = setTimeout(() => fn(...args), delay)
+    }
+}
+
 export const useTripStore = defineStore('trip', () => {
     const authStore = useAuthStore()
 
@@ -17,6 +28,14 @@ export const useTripStore = defineStore('trip', () => {
     const activeDay = ref(0)
     const unsubscribeSnapshot = ref(null)
     const isTripsLoading = ref(false)
+
+    const debouncedSaveToCloud = debounce(async (tripId, tripData) => {
+        try {
+            await saveTripData(tripId, tripData)
+        } catch (err) {
+            console.error('[AutoSave] Failed:', err)
+        }
+    }, 1500)
 
     const currentDaySpots = computed(() => {
         return currentTrip.value?.itinerary[activeDay.value]?.spots || []
@@ -121,7 +140,7 @@ export const useTripStore = defineStore('trip', () => {
                 localStorage.setItem('maplio_demo_data', JSON.stringify(trips.value))
             }
         } else {
-            await saveTripData(currentTrip.value.id, currentTrip.value)
+            debouncedSaveToCloud(currentTrip.value.id, currentTrip.value)
         }
     }
 
