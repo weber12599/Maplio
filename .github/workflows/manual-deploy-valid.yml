@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting (Production)
+name: Deploy to Firebase Hosting (Validation)
 
 on:
     workflow_dispatch:
@@ -22,6 +22,8 @@ on:
                 description: 'Version (e.g., v1.0.0)'
                 required: true
                 default:
+    pull_request:
+        types: [opened, synchronize, reopened]
 
 jobs:
     build_and_deploy:
@@ -40,13 +42,12 @@ jobs:
             - name: Get Version
               id: get_version
               run: |
-                  if [ -n "${{ inputs.version }}" ]; then
-                    echo "APP_VERSION=${{ inputs.version }}" >> $GITHUB_ENV
-                    echo "Using manual version: ${{ inputs.version }}"
+                  if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
+                    APP_VERSION="pr-${GITHUB_EVENT_NUMBER}-${GITHUB_SHA::8}"
                   else
-                    echo "Error: No manual version provided."
-                    exit 1
+                    APP_VERSION="${{ inputs.version }}"
                   fi
+                  echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
 
             - name: Install Dependencies
               run: npm ci
@@ -154,7 +155,8 @@ jobs:
                   repoToken: '${{ secrets.GITHUB_TOKEN }}'
                   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO }}'
                   public: dist
-                  channelId: live
+                  channelId: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'preview-manual' }}
+                  expires: 1d
                   projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
                   message: 'Release ${{ env.APP_VERSION }}'
 
@@ -179,7 +181,8 @@ jobs:
                   repoToken: '${{ secrets.GITHUB_TOKEN }}'
                   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO_OFFLINE }}'
                   public: dist-offline
-                  channelId: live
+                  channelId: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'preview-manual' }}
+                  expires: 1d
                   projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID_OFFLINE }}
                   message: 'Release Offline ${{ env.APP_VERSION }}'
 
@@ -194,11 +197,12 @@ jobs:
               with:
                   publish-dir: './dist-offline'
                   production-branch: main
+                  branch: ${{ github.head_ref || 'preview-manual' }}
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   deploy-message: 'Deploy v${{ env.APP_VERSION }} from GitHub Actions'
-                  enable-pull-request-comment: false
+                  enable-pull-request-comment: true
                   enable-commit-comment: false
-                  overwrites-pull-request-comment: false
+                  overwrites-pull-request-comment: true
               env:
                   NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
                   NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
@@ -206,19 +210,3 @@ jobs:
             - name: Skip Netlify Deploy
               if: ${{ inputs.deploy_netlify == true && steps.check_secrets.outputs.netlify_ok == 'false' }}
               run: echo "⚠️ Netlify offline deployment skipped due to missing secrets."
-
-            - name: Zip Offline Artifact
-              run: |
-                  cd dist-offline
-                  zip -r ../maplio-offline.zip ./*
-                  echo "✅ Zip created: maplio-offline.zip"
-
-            - name: Create GitHub Release
-              uses: softprops/action-gh-release@v1
-              with:
-                  tag_name: ${{ env.APP_VERSION }}
-                  name: Release ${{ env.APP_VERSION }}
-                  files: maplio-offline.zip
-                  draft: false
-                  prerelease: false
-                  generate_release_notes: true

@@ -1,5 +1,6 @@
 {
-  "projects": {
-    "default": "maplio"
-  }
+    "projects": {
+        "online": "maplio",
+        "offline": "maplio-offline"
+    }
 }
