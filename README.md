@@ -56,8 +56,7 @@ If you want to experience Maplio immediately without any setup:
   Download the single HTML file to use locally:
     1.  Go to the **[Releases](../../releases)** page.
     2.  Download the latest `maplio-offline.zip` and unzip it.
-    3.  Open `index.html` directly in Chrome or Edge.
-        > **⚠️ Note**: Safari restricts local file access (`file://`). For iOS/macOS users, please use the Web Demo above or the Netlify method below.
+    3.  Open `index.html` directly in Chrome, Edge or Safari.
 
 ### 2. Self-Host - Firebase (Recommended)
 
@@ -69,10 +68,10 @@ If you want **Cloud Sync & Collaboration features** (Online Mode) or want to hos
 
 ### 3. Self-Host - Netlify (Quick)
 
-If you only need **Offline Mode features** but want to use it on mobile (iOS/Android) or bypass Safari's local file restrictions, Netlify is the fastest free solution.
+If you only need **Offline Mode features**, Netlify is the fastest free solution.
 
 - **Modes**: ✅ Offline Mode (Offline only)
-- **Pros**: No coding required, mobile-friendly, solves Safari permission issues.
+- **Pros**: No coding required, mobile-friendly.
 - **Steps**:
     1.  Download and unzip `maplio-offline.zip`.
     2.  Go to **[Netlify Drop](https://app.netlify.com/drop)**.

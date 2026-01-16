@@ -56,8 +56,7 @@ Maplio 是一個基於 Vue 3 與 OpenStreetMap 的旅遊行程規劃工具。支
   下載單一 HTML 檔案，無網路也能使用：
     1.  前往 GitHub 的 **[Releases](../../releases)** 頁面。
     2.  下載最新版本的 `maplio-offline.zip` 並解壓縮。
-    3.  使用 Chrome 或 Edge 瀏覽器直接開啟 `index.html` 即可。
-        > **⚠️ 注意**：由於瀏覽器安全限制，Safari 無法直接開啟本地檔案。iOS/Mac 使用者請使用上方的網頁版，或參考下方的 Netlify 架站方式。
+    3.  使用 Chrome 、 Edge 或 Safari 瀏覽器直接開啟 `index.html` 即可。
 
 ### 2. 自行架設 - Firebase (推薦)
 
@@ -69,10 +68,10 @@ Maplio 是一個基於 Vue 3 與 OpenStreetMap 的旅遊行程規劃工具。支
 
 ### 3. 自行架設 - Netlify (快速)
 
-如果您只需要 **離線版功能**，但希望在手機 (iOS/Android) 上方便開啟，或是想解決 Safari 本地檔案的限制，Netlify 是最快速的免費方案。
+如果您只需要 **離線版功能**，Netlify 是最快速的免費方案。
 
 - **適用模式**：✅ Offline Mode (僅限離線版)
-- **優點**：無需寫程式、支援手機瀏覽、解決 Safari 權限問題。
+- **優點**：無需寫程式、支援手機瀏覽。
 - **步驟**：
     1.  下載並解壓縮 `maplio-offline.zip`。
     2.  開啟 **[Netlify Drop](https://app.netlify.com/drop)** 網頁。
