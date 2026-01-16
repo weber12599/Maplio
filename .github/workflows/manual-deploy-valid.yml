@@ -157,7 +157,7 @@ jobs:
 
             - name: Online Deploy to Firebase
               if: ${{ (env.DEPLOY_ONLINE == 'true' || inputs.deploy_online == true) && steps.check_secrets.outputs.online_ok == 'true' }}
-              uses: FirebaseExtended/action-hosting-deploy@v1
+              uses: FirebaseExtended/action-hosting-deploy@v0
               with:
                   repoToken: '${{ secrets.GITHUB_TOKEN }}'
                   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO }}'
@@ -183,7 +183,7 @@ jobs:
 
             - name: Offline Deploy to Firebase
               if: ${{ (env.DEPLOY_OFFLINE == 'true' || inputs.deploy_offline == true) && steps.check_secrets.outputs.offline_ok == 'true' }}
-              uses: FirebaseExtended/action-hosting-deploy@v1
+              uses: FirebaseExtended/action-hosting-deploy@v0
               with:
                   repoToken: '${{ secrets.GITHUB_TOKEN }}'
                   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO_OFFLINE }}'
