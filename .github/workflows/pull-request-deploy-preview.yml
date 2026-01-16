@@ -78,6 +78,6 @@ jobs:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   firebase_channel_id: pr-${{ github.event.pull_request.number }}
                   firebase_service_account: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO_OFFLINE }}
-                  firebase_project: ${{ secrets.VITE_FIREBASE_PROJECT_ID_OFFLINE }}
+                  firebase_project_id: ${{ secrets.VITE_FIREBASE_PROJECT_ID_OFFLINE }}
                   netlify_auth_token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
                   netlify_site_id: ${{ secrets.NETLIFY_SITE_ID }}
