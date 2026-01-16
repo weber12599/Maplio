@@ -34,22 +34,10 @@ jobs:
               with:
                   fetch-depth: 0
 
-            # ----------------------------------------------------------------
-            # 1. Version Handling
-            # ----------------------------------------------------------------
-            - name: Get Version
-              id: get_version
-              run: |
-                  if [ -n "${{ inputs.version }}" ]; then
-                    echo "APP_VERSION=${{ inputs.version }}" >> $GITHUB_ENV
-                    echo "Using manual version: ${{ inputs.version }}"
-                  else
-                    echo "Error: No manual version provided."
-                    exit 1
-                  fi
-
-            - name: Install Dependencies
-              run: npm ci
+            - name: Setup Environment
+              uses: ./.github/actions/setup-env
+              with:
+                  manual_version: ${{ inputs.version }}
 
             # ----------------------------------------------------------------
             # 2. Check & Validate Secrets
@@ -167,7 +155,10 @@ jobs:
             # 4. Offline Build & Deployment (Firebase / Netlify / GitHub Release Zip)
             # ----------------------------------------------------------------
             - name: Build for Offline
-              run: npm run build:offline
+              run: |
+                  npm run build:offline
+                  rm -rf dist
+                  cp -r dist-offline dist
               env:
                   VITE_APP_MODE: offline
                   VITE_APP_VERSION: ${{ env.APP_VERSION }}

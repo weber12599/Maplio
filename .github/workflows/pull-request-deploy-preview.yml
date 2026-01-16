@@ -1,27 +1,6 @@
 name: Deploy to Firebase Hosting (Validation)
 
 on:
-    workflow_dispatch:
-        inputs:
-            deploy_online:
-                description: 'Deploy online (Firebase)'
-                type: boolean
-                required: true
-                default: true
-            deploy_offline:
-                description: 'Deploy offline (Firebase)'
-                type: boolean
-                required: true
-                default: true
-            deploy_netlify:
-                description: 'Deploy offline (Netlify)'
-                type: boolean
-                required: true
-                default: true
-            version:
-                description: 'Version (e.g., v1.0.0)'
-                required: true
-                default:
     pull_request:
         types: [opened, synchronize, reopened]
 
@@ -44,21 +23,10 @@ jobs:
                   echo "DEPLOY_OFFLINE=true" >> $GITHUB_ENV
                   echo "DEPLOY_NETLIFY=true" >> $GITHUB_ENV
 
-            # ----------------------------------------------------------------
-            # 1. Version Handling
-            # ----------------------------------------------------------------
-            - name: Get Version
-              id: get_version
-              run: |
-                  if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
-                    APP_VERSION="pr-${GITHUB_EVENT_NUMBER}-${GITHUB_SHA::8}"
-                  else
-                    APP_VERSION="${{ inputs.version }}"
-                  fi
-                  echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
-
-            - name: Install Dependencies
-              run: npm ci
+            - name: Setup Environment
+              uses: ./.github/actions/setup-env
+              with:
+                  manual_version: ${{ inputs.version }}
 
             # ----------------------------------------------------------------
             # 2. Check & Validate Secrets

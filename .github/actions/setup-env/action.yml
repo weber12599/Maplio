@@ -1,0 +1,39 @@
+name: 'Setup Environment'
+description: 'Sets up Node.js, installs dependencies, and generates version'
+inputs:
+    manual_version:
+        description: 'Manual version string'
+        required: false
+outputs:
+    app_version:
+        description: 'The generated version string'
+        value: ${{ steps.get_version.outputs.version }}
+runs:
+    using: 'composite'
+    steps:
+        - name: Get Version
+          id: get_version
+          shell: bash
+          run: |
+              if [ "${{ github.event_name }}" == "pull_request" ]; then
+                SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-8)
+                V="pr-${{ github.event.number }}-$SHORT_SHA"
+              elif [ -n "${{ inputs.manual_version }}" ]; then
+                V="${{ inputs.manual_version }}"
+              else
+                echo "Error: No version info available (not a PR and no manual version provided)."
+                exit 1
+              fi
+              echo "version=$V" >> $GITHUB_OUTPUT
+              echo "APP_VERSION=$V" >> $GITHUB_ENV
+              echo "✅ Version determined: $V"
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+              node-version: '20'
+              cache: 'npm'
+
+        - name: Install Dependencies
+          shell: bash
+          run: npm ci
