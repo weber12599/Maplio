@@ -174,7 +174,10 @@ jobs:
             # 4. Offline Build & Deployment (Firebase / Netlify / GitHub Release Zip)
             # ----------------------------------------------------------------
             - name: Build for Offline
-              run: npm run build:offline
+              run: |
+                  npm run build:offline
+                  rm -rf dist
+                  cp -r dist-offline dist
               env:
                   VITE_APP_MODE: offline
                   VITE_APP_VERSION: ${{ env.APP_VERSION }}
