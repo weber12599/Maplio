@@ -161,7 +161,6 @@ jobs:
               with:
                   repoToken: '${{ secrets.GITHUB_TOKEN }}'
                   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO }}'
-                  public: dist
                   channelId: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'preview-manual' }}
                   expires: 1d
                   projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -187,7 +186,6 @@ jobs:
               with:
                   repoToken: '${{ secrets.GITHUB_TOKEN }}'
                   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO_OFFLINE }}'
-                  public: dist-offline
                   channelId: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'preview-manual' }}
                   expires: 1d
                   projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID_OFFLINE }}
