@@ -1,0 +1,94 @@
+name: 'Validate Secrets'
+description: 'Validates Firebase and Netlify secrets based on deployment flags'
+inputs:
+    deploy_online:
+        description: 'Whether to deploy online'
+        required: true
+    deploy_offline:
+        description: 'Whether to deploy offline'
+        required: true
+    deploy_netlify:
+        description: 'Whether to deploy to Netlify'
+        required: true
+    firebase_service_account:
+        required: false
+        default: ''
+    firebase_api_key:
+        required: false
+        default: ''
+    firebase_auth_domain:
+        required: false
+        default: ''
+    firebase_project_id:
+        required: false
+        default: ''
+    firebase_storage_bucket:
+        required: false
+        default: ''
+    firebase_messaging_sender_id:
+        required: false
+        default: ''
+    firebase_app_id:
+        required: false
+        default: ''
+    firebase_service_account_offline:
+        required: false
+        default: ''
+    firebase_project_id_offline:
+        required: false
+        default: ''
+    netlify_auth_token:
+        required: false
+        default: ''
+    netlify_site_id:
+        required: false
+        default: ''
+outputs:
+    online_ok:
+        description: 'Online secrets status'
+        value: ${{ steps.check.outputs.online_ok }}
+    offline_ok:
+        description: 'Offline secrets status'
+        value: ${{ steps.check.outputs.offline_ok }}
+    netlify_ok:
+        description: 'Netlify secrets status'
+        value: ${{ steps.check.outputs.netlify_ok }}
+runs:
+    using: 'composite'
+    steps:
+        - id: check
+          shell: bash
+          run: |
+              ONLINE_OK="true"
+              OFFLINE_OK="true"
+              NETLIFY_OK="true"
+              echo "🔍 Starting Secret Validation..."
+
+              # A. Check Online
+              if [ "${{ inputs.deploy_online }}" == "true" ]; then
+                if [ -z "${{ inputs.firebase_service_account }}" ] || [ -z "${{ inputs.firebase_api_key }}" ] || [ -z "${{ inputs.firebase_auth_domain }}" ] || [ -z "${{ inputs.firebase_project_id }}" ] || [ -z "${{ inputs.firebase_storage_bucket }}" ] || [ -z "${{ inputs.firebase_messaging_sender_id }}" ] || [ -z "${{ inputs.firebase_app_id }}" ] || []; then
+                  echo "❌ Missing Online Firebase Secrets"
+                  ONLINE_OK="false"
+                fi
+              fi
+
+              # B. Check Offline (Firebase)
+              if [ "${{ inputs.deploy_offline }}" == "true" ]; then
+                if [ -z "${{ inputs.firebase_service_account_offline }}" ] || [ -z "${{ inputs.firebase_project_id_offline }}" ]; then
+                  echo "❌ Missing Offline Firebase Secrets"
+                  OFFLINE_OK="false"
+                fi
+              fi
+
+              # C. Check Netlify
+              if [ "${{ inputs.deploy_netlify }}" == "true" ]; then
+                if [ -z "${{ inputs.netlify_auth_token }}" ] || [ -z "${{ inputs.netlify_site_id }}" ]; then
+                  echo "❌ Missing Netlify Secrets"
+                  NETLIFY_OK="false"
+                fi
+              fi
+
+              echo "online_ok=$ONLINE_OK" >> $GITHUB_OUTPUT
+              echo "offline_ok=$OFFLINE_OK" >> $GITHUB_OUTPUT
+              echo "netlify_ok=$NETLIFY_OK" >> $GITHUB_OUTPUT
+              echo "✅ Validation Summary - Online: $ONLINE_OK, Offline: $OFFLINE_OK, Netlify: $NETLIFY_OK"

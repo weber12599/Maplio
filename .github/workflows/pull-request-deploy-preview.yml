@@ -28,87 +28,27 @@ jobs:
               with:
                   manual_version: ${{ inputs.version }}
 
-            # ----------------------------------------------------------------
-            # 2. Check & Validate Secrets
-            # ----------------------------------------------------------------
-            - name: Check & Validate Secrets
+            - name: Validate Secrets
               id: check_secrets
-              run: |
-                  # Initialize status
-                  ONLINE_OK="true"
-                  OFFLINE_OK="true"
-                  NETLIFY_OK="true"
-
-                  echo "🔍 Starting Secret Validation..."
-
-                  # --- A. Check Online Required Secrets ---
-                  if [ "${{ inputs.deploy_online }}" == "true" ]; then
-                    # 1. Check Firebase Service Account
-                    if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO }}" ]; then
-                      echo "❌ Missing Secret: FIREBASE_SERVICE_ACCOUNT_MAPLIO"
-                      ONLINE_OK="false"
-                    fi
-                    
-                    # 2. Check VITE Keys (Required for Build)
-                    if [ -z "${{ secrets.VITE_FIREBASE_API_KEY }}" ]; then
-                      echo "❌ Missing Secret: VITE_FIREBASE_API_KEY"
-                      ONLINE_OK="false"
-                    fi
-                    if [ -z "${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}" ]; then
-                      echo "❌ Missing Secret: VITE_FIREBASE_AUTH_DOMAIN"
-                      ONLINE_OK="false"
-                    fi
-                    if [ -z "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" ]; then
-                      echo "❌ Missing Secret: VITE_FIREBASE_PROJECT_ID"
-                      ONLINE_OK="false"
-                    fi
-                    if [ -z "${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}" ]; then
-                      echo "❌ Missing Secret: VITE_FIREBASE_STORAGE_BUCKET"
-                      ONLINE_OK="false"
-                    fi
-                    if [ -z "${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}" ]; then
-                      echo "❌ Missing Secret: VITE_FIREBASE_MESSAGING_SENDER_ID"
-                      ONLINE_OK="false"
-                    fi
-                    if [ -z "${{ secrets.VITE_FIREBASE_APP_ID }}" ]; then
-                      echo "❌ Missing Secret: VITE_FIREBASE_APP_ID"
-                      ONLINE_OK="false"
-                    fi
-                  fi
-
-                  # --- B. Check Offline Required Secrets ---
-                  if [ "${{ inputs.deploy_offline }}" == "true" ]; then
-                    if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO_OFFLINE }}" ]; then
-                      echo "❌ Missing Secret: FIREBASE_SERVICE_ACCOUNT_MAPLIO_OFFLINE"
-                      OFFLINE_OK="false"
-                    fi
-                    if [ -z "${{ secrets.VITE_FIREBASE_PROJECT_ID_OFFLINE }}" ]; then
-                      echo "❌ Missing Secret: VITE_FIREBASE_PROJECT_ID_OFFLINE"
-                      OFFLINE_OK="false"
-                    fi
-                  fi
-
-                  # --- C. Check Netlify Required Secrets ---
-                  if [ "${{ inputs.deploy_netlify }}" == "true" ]; then
-                    if [ -z "${{ secrets.NETLIFY_AUTH_TOKEN }}" ]; then
-                        echo "❌ Missing Secret: NETLIFY_AUTH_TOKEN"
-                        NETLIFY_OK="false"
-                    fi
-                    if [ -z "${{ secrets.NETLIFY_SITE_ID }}" ]; then
-                        echo "❌ Missing Secret: NETLIFY_SITE_ID"
-                        NETLIFY_OK="false"
-                    fi
-                  fi
-
-                  # Output results for subsequent steps
-                  echo "online_ok=$ONLINE_OK" >> $GITHUB_OUTPUT
-                  echo "offline_ok=$OFFLINE_OK" >> $GITHUB_OUTPUT
-                  echo "netlify_ok=$NETLIFY_OK" >> $GITHUB_OUTPUT
-
-                  echo "✅ Validation Complete. Online: $ONLINE_OK, Offline: $OFFLINE_OK, Netlify: $NETLIFY_OK"
+              uses: ./.github/actions/validate-secrets
+              with:
+                  deploy_online: ${{ inputs.deploy_online }}
+                  deploy_offline: ${{ inputs.deploy_offline }}
+                  deploy_netlify: ${{ inputs.deploy_netlify }}
+                  firebase_service_account: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO }}
+                  firebase_api_key: ${{ secrets.VITE_FIREBASE_API_KEY }}
+                  firebase_auth_domain: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+                  firebase_project_id: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+                  firebase_storage_bucket: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+                  firebase_messaging_sender_id: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+                  firebase_app_id: ${{ secrets.VITE_FIREBASE_APP_ID }}
+                  firebase_service_account_offline: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO_OFFLINE }}
+                  firebase_project_id_offline: ${{ secrets.VITE_FIREBASE_PROJECT_ID_OFFLINE }}
+                  netlify_auth_token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+                  netlify_site_id: ${{ secrets.NETLIFY_SITE_ID }}
 
             # ----------------------------------------------------------------
-            # 3. Online Build & Deployment (Firebase)
+            # 1. Online Build & Deployment (Firebase)
             # ----------------------------------------------------------------
             - name: Build for Online
               # Execute only if deploy_online is true AND secrets check passed (ONLINE_OK=true)
@@ -140,7 +80,7 @@ jobs:
                   echo "⚠️ Firebase online deployment skipped due to missing secrets."
 
             # ----------------------------------------------------------------
-            # 4. Offline Build & Deployment (Firebase / Netlify / GitHub Release Zip)
+            # 2. Offline Build & Deployment (Firebase / Netlify)
             # ----------------------------------------------------------------
             - name: Build for Offline
               run: |
