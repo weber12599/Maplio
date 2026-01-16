@@ -153,7 +153,6 @@ jobs:
               with:
                   repoToken: '${{ secrets.GITHUB_TOKEN }}'
                   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO }}'
-                  target: online
                   channelId: live
                   projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
                   message: 'Release ${{ env.APP_VERSION }}'
@@ -178,7 +177,6 @@ jobs:
               with:
                   repoToken: '${{ secrets.GITHUB_TOKEN }}'
                   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAPLIO_OFFLINE }}'
-                  target: offline
                   channelId: live
                   projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID_OFFLINE }}
                   message: 'Release Offline ${{ env.APP_VERSION }}'
