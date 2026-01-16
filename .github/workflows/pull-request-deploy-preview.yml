@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting (Validation)
+name: Deploy (Validation)
 
 on:
     pull_request:
