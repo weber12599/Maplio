@@ -16,7 +16,8 @@ runs:
           shell: bash
           run: |
               if [ "${{ github.event_name }}" == "pull_request" ]; then
-                SHORT_SHA=$(echo "${{ github.event.pull_request.head.sha }}" | cut -c1-8)
+                SHORT_SHA=${{ github.event.pull_request.head.sha }}
+                SHORT_SHA=${SHORT_SHA::8} 
                 V="pr-${{ github.event.number }}-$SHORT_SHA"
               elif [ -n "${{ inputs.manual_version }}" ]; then
                 V="${{ inputs.manual_version }}"
