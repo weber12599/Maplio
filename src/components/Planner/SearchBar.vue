@@ -22,7 +22,9 @@
 
             <input
                 v-model="query"
-                @keydown.enter="$emit('search', query)"
+                @compositionstart="handleCompositionStart"
+                @compositionend="handleCompositionEnd"
+                @keydown.enter="handleEnter"
                 :placeholder="$t('planner.search_placeholder')"
                 :class="[
                     'w-full pl-12 pr-12 py-4 rounded-2xl text-sm outline-none border transition-all duration-500 shadow-sm',
@@ -30,16 +32,31 @@
                 ]"
             />
 
-            <button
-                v-if="query"
-                @click="clear"
-                :class="[
-                    'absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full transition-all hover:bg-black/5 active:scale-90',
-                    themeConfig.searchIconClass
-                ]"
-            >
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <template v-if="query">
+                    <button
+                        @click="clear"
+                        :class="[
+                            'w-8 h-8 flex items-center justify-center rounded-full transition-all hover:bg-black/5 active:scale-90',
+                            themeConfig.searchIconClass
+                        ]"
+                    >
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </template>
+
+                <template v-else>
+                    <button
+                        @click="handlePaste"
+                        :class="[
+                            'w-8 h-8 flex items-center justify-center rounded-full transition-all hover:bg-black/5 active:scale-90',
+                            themeConfig.searchIconClass
+                        ]"
+                    >
+                        <i class="fa-regular fa-clipboard"></i>
+                    </button>
+                </template>
+            </div>
         </div>
 
         <div
@@ -70,6 +87,7 @@
 </template>
 
 <script setup>
+import { parseGoogleMapUrl } from '@/utils/mapUtils'
 import { ref } from 'vue'
 
 defineProps({
@@ -81,6 +99,62 @@ defineProps({
 const emit = defineEmits(['search', 'select', 'clear'])
 
 const query = ref('')
+const isComposing = ref(false)
+
+const handlePaste = async () => {
+    try {
+        const text = await navigator.clipboard.readText()
+        query.value = text
+        handleSearch()
+    } catch (err) {
+        console.error('Clipboard permission denied')
+        clear()
+    }
+}
+
+const searchOnGoogleMaps = () => {
+    if (!query.value.trim()) {
+        return
+    }
+
+    const keyword = encodeURIComponent(query.value)
+    const url = `https://www.google.com/maps/search/?api=1&query=${keyword}`
+    window.open(url, '_blank')
+}
+
+const handleCompositionStart = () => {
+    isComposing.value = true
+}
+
+const handleCompositionEnd = () => {
+    setTimeout(() => {
+        isComposing.value = false
+    }, 0)
+}
+
+const handleEnter = (e) => {
+    console.log(isComposing.value)
+    if (isComposing.value || e.isComposing) return
+    handleSearch()
+}
+
+const handleSearch = () => {
+    if (parseGoogleMapUrl(query.value)) {
+        emit('search', query.value)
+        return
+    }
+
+    switch (localStorage.getItem('maplio_search_provider')) {
+        case 'google':
+            searchOnGoogleMaps()
+            break
+        case 'osm':
+            emit('search', query.value)
+            break
+        default:
+            break
+    }
+}
 
 const clear = () => {
     query.value = ''
