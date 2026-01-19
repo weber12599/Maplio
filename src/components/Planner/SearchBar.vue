@@ -22,7 +22,9 @@
 
             <input
                 v-model="query"
-                @keydown.enter="handleSearch"
+                @compositionstart="handleCompositionStart"
+                @compositionend="handleCompositionEnd"
+                @keydown.enter="handleEnter"
                 :placeholder="$t('planner.search_placeholder')"
                 :class="[
                     'w-full pl-12 pr-12 py-4 rounded-2xl text-sm outline-none border transition-all duration-500 shadow-sm',
@@ -97,6 +99,7 @@ defineProps({
 const emit = defineEmits(['search', 'select', 'clear'])
 
 const query = ref('')
+const isComposing = ref(false)
 
 const handlePaste = async () => {
     try {
@@ -117,6 +120,22 @@ const searchOnGoogleMaps = () => {
     const keyword = encodeURIComponent(query.value)
     const url = `https://www.google.com/maps/search/?api=1&query=${keyword}`
     window.open(url, '_blank')
+}
+
+const handleCompositionStart = () => {
+    isComposing.value = true
+}
+
+const handleCompositionEnd = () => {
+    setTimeout(() => {
+        isComposing.value = false
+    }, 0)
+}
+
+const handleEnter = (e) => {
+    console.log(isComposing.value)
+    if (isComposing.value || e.isComposing) return
+    handleSearch()
 }
 
 const handleSearch = () => {
