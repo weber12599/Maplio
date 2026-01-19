@@ -216,6 +216,48 @@
                             </button>
                         </div>
 
+                        <button
+                            @click="toggleSubMenu('search')"
+                            :class="themes[currentTheme].menuItemClass"
+                            class="justify-between group"
+                        >
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-magnifying-glass w-5 text-center"></i>
+                                {{ $t('app.search_provider') }}
+                            </div>
+                            <i
+                                class="fa-solid fa-chevron-down text-[10px] opacity-50 transition-transform duration-300"
+                                :class="{ 'rotate-180': subMenu === 'search' }"
+                            ></i>
+                        </button>
+
+                        <div
+                            v-if="subMenu === 'search'"
+                            class="pl-10 pr-2 py-1 space-y-1 bg-opacity-50"
+                            :class="currentTheme === 'dark' ? 'bg-slate-800' : 'bg-stone-50'"
+                        >
+                            <button
+                                v-for="meta in [
+                                    { value: 'google', label: $t('app.provider_google') },
+                                    { value: 'osm', label: $t('app.provider_osm') }
+                                ]"
+                                :key="meta.value"
+                                @click="setSearchProvider(meta.value)"
+                                :class="[
+                                    'w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center transition-colors',
+                                    searchProvider === meta.value
+                                        ? 'font-bold text-blue-500'
+                                        : 'opacity-70 hover:opacity-100'
+                                ]"
+                            >
+                                <span>{{ meta.label }}</span>
+                                <i
+                                    v-if="searchProvider === meta.value"
+                                    class="fa-solid fa-check"
+                                ></i>
+                            </button>
+                        </div>
+
                         <div class="h-px my-1 mx-2 opacity-10 bg-current"></div>
 
                         <button
@@ -286,6 +328,7 @@ const { t, locale } = useI18n()
 
 const isMenuOpen = ref(false)
 const subMenu = ref(null)
+const searchProvider = ref(localStorage.getItem('maplio_search_provider') || 'google')
 
 const logoSrc = computed(() => {
     return props.currentTheme === 'muji' ? logoDefault : logoDark
@@ -309,6 +352,11 @@ const setTheme = (themeName) => {
 const setLang = (langCode) => {
     locale.value = langCode
     localStorage.setItem('maplio_locale', langCode)
+}
+
+const setSearchProvider = (provider) => {
+    searchProvider.value = provider
+    localStorage.setItem('maplio_search_provider', provider)
 }
 
 const showVersionInfo = () => {
