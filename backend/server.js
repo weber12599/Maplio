@@ -21,6 +21,41 @@ app.use(cors())
 // Parse incoming JSON payloads
 app.use(express.json())
 
+// Global browser instance
+let globalBrowser = null
+
+// Function to initialize or retrieve the existing browser instance
+async function getBrowser() {
+    if (globalBrowser && globalBrowser.isConnected()) {
+        return globalBrowser
+    }
+
+    console.log('Launching new Puppeteer instance...')
+    globalBrowser = await puppeteer.launch({
+        headless: 'new',
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage', // Crucial for Docker (uses /tmp instead of /dev/shm)
+            '--lang=en-US', // Force English to reliably detect "Accept" buttons
+            '--disable-accelerated-2d-canvas',
+            '--disable-gpu'
+        ]
+    })
+    return globalBrowser
+}
+
+// Function to safely close a page
+async function closePage(page) {
+    if (page) {
+        try {
+            await page.close()
+        } catch (e) {
+            console.error('Error closing page:', e)
+        }
+    }
+}
+
 // ==========================================
 // MIDDLEWARE
 // ==========================================
@@ -74,23 +109,23 @@ app.post('/expandGoogleUrl', async (req, res) => {
     }
 
     console.log(`[Processing] URL: ${shortUrl}`)
-    let browser = null
-
+    let page = null
     try {
-        // 2. Launch Puppeteer (Headless Chrome)
-        // Note: 'headless: "new"' is the modern mode.
-        // Args are optimized for Docker environments to prevent crashes.
-        browser = await puppeteer.launch({
-            headless: 'new',
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage', // Crucial for Docker (uses /tmp instead of /dev/shm)
-                '--lang=en-US' // Force English to reliably detect "Accept" buttons
-            ]
-        })
+        // 2. Reuse the global browser instance
+        const browser = await getBrowser()
+        page = await browser.newPage()
 
-        const page = await browser.newPage()
+        // 2.1 Block heavy resources
+        await page.setRequestInterception(true)
+        page.on('request', (req) => {
+            const resourceType = req.resourceType()
+            // Block images, fonts, styles, media to save bandwidth and CPU
+            if (['image', 'stylesheet', 'font', 'media', 'imageset'].includes(resourceType)) {
+                req.abort()
+            } else {
+                req.continue()
+            }
+        })
 
         // 3. Set User-Agent
         // Spoof a standard desktop browser to avoid being served the mobile "Lite" version of Maps
@@ -100,7 +135,7 @@ app.post('/expandGoogleUrl', async (req, res) => {
 
         // 4. Navigate to the URL
         // We use 'domcontentloaded' for speed. We will handle the specific wait logic manually below.
-        await page.goto(shortUrl, { waitUntil: 'domcontentloaded', timeout: 30000 })
+        page.goto(shortUrl, { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {})
 
         // 5. Smart Wait Logic
         // We poll the URL to see if it has resolved to the final Google Maps format (coordinates).
@@ -116,7 +151,7 @@ app.post('/expandGoogleUrl', async (req, res) => {
         }
 
         let attempts = 0
-        const maxAttempts = 15 // Wait up to ~15 seconds
+        const maxAttempts = 100
 
         while (attempts < maxAttempts) {
             const currentUrl = page.url()
@@ -146,14 +181,14 @@ app.post('/expandGoogleUrl', async (req, res) => {
                         else if (buttons.length > 0) buttons[0].click()
                     })
                     // Wait briefly for navigation after clicking
-                    await new Promise((r) => setTimeout(r, 2000))
+                    await new Promise((r) => setTimeout(r, 500))
                 } catch (e) {
                     console.warn('[Consent] Failed to click consent button:', e.message)
                 }
             }
 
             // Wait 1 second before next check
-            await new Promise((r) => setTimeout(r, 1000))
+            await new Promise((r) => setTimeout(r, 200))
             attempts++
         }
 
@@ -161,58 +196,43 @@ app.post('/expandGoogleUrl', async (req, res) => {
         const finalUrl = page.url()
         console.log(`[Resolved] Final URL: ${finalUrl}`)
 
-        let coords = null
-
-        // Pattern 1: URL contains @lat,lng (standard view)
-        const atMatch = finalUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)
-        if (atMatch) {
-            coords = { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) }
-        }
-        // Pattern 2: URL contains query params ?q=lat,lng or &ll=lat,lng (search view)
-        else {
-            const queryMatch = finalUrl.match(/[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/)
-            if (queryMatch) {
-                coords = { lat: parseFloat(queryMatch[1]), lng: parseFloat(queryMatch[2]) }
-            }
-        }
-
-        const pageTitle = await page.title()
-        await browser.close()
-
         // 7. Send Response
-        if (coords) {
+        if (
+            finalUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
+            finalUrl.match(/[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/)
+        ) {
             res.json({
                 success: true,
-                finalUrl: finalUrl,
-                coordinates: coords,
-                title: pageTitle
+                finalUrl: finalUrl
             })
         } else {
             // Even if no coordinates found, return the resolved URL (client might parse it differently)
             res.json({
                 success: true,
                 warning: 'Coordinates not found in the final URL',
-                finalUrl: finalUrl,
-                title: pageTitle
+                finalUrl: finalUrl
             })
         }
     } catch (error) {
         console.error('[Error] Puppeteer execution failed:', error)
 
-        // Ensure browser is closed in case of error
-        if (browser) await browser.close()
-
         res.status(500).json({
             error: 'Internal Server Error',
             details: error.message
         })
+    } finally {
+        // Only close the page, NOT the browser
+        await closePage(page)
     }
 })
 
 // ==========================================
 // START SERVER
 // ==========================================
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`)
-    console.log(`Security enabled. API Key required for POST requests.`)
+getBrowser().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`)
+        console.log(`Security enabled. API Key required for POST requests.`)
+    })
 })
+
