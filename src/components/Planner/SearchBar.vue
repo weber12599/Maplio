@@ -151,6 +151,7 @@ const handleSearch = () => {
             emit('search', query.value)
             break
         default:
+            searchOnGoogleMaps()
             break
     }
 }
