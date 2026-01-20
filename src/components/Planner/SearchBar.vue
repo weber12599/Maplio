@@ -24,7 +24,7 @@
                 v-model="query"
                 @compositionstart="handleCompositionStart"
                 @compositionend="handleCompositionEnd"
-                @keydown.enter="handleEnter"
+                @keyup.enter="handleEnter"
                 :placeholder="$t('planner.search_placeholder')"
                 :class="[
                     'w-full pl-12 pr-12 py-4 rounded-2xl text-sm outline-none border transition-all duration-500 shadow-sm',
@@ -133,7 +133,6 @@ const handleCompositionEnd = () => {
 }
 
 const handleEnter = (e) => {
-    console.log(isComposing.value)
     if (isComposing.value || e.isComposing) return
     handleSearch()
 }
@@ -152,6 +151,7 @@ const handleSearch = () => {
             emit('search', query.value)
             break
         default:
+            searchOnGoogleMaps()
             break
     }
 }
