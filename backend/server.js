@@ -21,6 +21,41 @@ app.use(cors())
 // Parse incoming JSON payloads
 app.use(express.json())
 
+// Global browser instance
+let globalBrowser = null
+
+// Function to initialize or retrieve the existing browser instance
+async function getBrowser() {
+    if (globalBrowser && globalBrowser.isConnected()) {
+        return globalBrowser
+    }
+
+    console.log('Launching new Puppeteer instance...')
+    globalBrowser = await puppeteer.launch({
+        headless: 'new',
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage', // Crucial for Docker (uses /tmp instead of /dev/shm)
+            '--lang=en-US', // Force English to reliably detect "Accept" buttons
+            '--disable-accelerated-2d-canvas',
+            '--disable-gpu'
+        ]
+    })
+    return globalBrowser
+}
+
+// Function to safely close a page
+async function closePage(page) {
+    if (page) {
+        try {
+            await page.close()
+        } catch (e) {
+            console.error('Error closing page:', e)
+        }
+    }
+}
+
 // ==========================================
 // MIDDLEWARE
 // ==========================================
@@ -74,23 +109,11 @@ app.post('/expandGoogleUrl', async (req, res) => {
     }
 
     console.log(`[Processing] URL: ${shortUrl}`)
-    let browser = null
-
+    let page = null
     try {
-        // 2. Launch Puppeteer (Headless Chrome)
-        // Note: 'headless: "new"' is the modern mode.
-        // Args are optimized for Docker environments to prevent crashes.
-        browser = await puppeteer.launch({
-            headless: 'new',
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage', // Crucial for Docker (uses /tmp instead of /dev/shm)
-                '--lang=en-US' // Force English to reliably detect "Accept" buttons
-            ]
-        })
-
-        const page = await browser.newPage()
+        // 2. Reuse the global browser instance
+        const browser = await getBrowser()
+        page = await browser.newPage()
 
         // 3. Set User-Agent
         // Spoof a standard desktop browser to avoid being served the mobile "Lite" version of Maps
@@ -177,7 +200,6 @@ app.post('/expandGoogleUrl', async (req, res) => {
         }
 
         const pageTitle = await page.title()
-        await browser.close()
 
         // 7. Send Response
         if (coords) {
@@ -199,20 +221,23 @@ app.post('/expandGoogleUrl', async (req, res) => {
     } catch (error) {
         console.error('[Error] Puppeteer execution failed:', error)
 
-        // Ensure browser is closed in case of error
-        if (browser) await browser.close()
-
         res.status(500).json({
             error: 'Internal Server Error',
             details: error.message
         })
+    } finally {
+        // Only close the page, NOT the browser
+        await closePage(page)
     }
 })
 
 // ==========================================
 // START SERVER
 // ==========================================
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`)
-    console.log(`Security enabled. API Key required for POST requests.`)
+getBrowser().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`)
+        console.log(`Security enabled. API Key required for POST requests.`)
+    })
 })
+
