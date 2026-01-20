@@ -151,7 +151,7 @@ app.post('/expandGoogleUrl', async (req, res) => {
         }
 
         let attempts = 0
-        const maxAttempts = 15 // Wait up to ~15 seconds
+        const maxAttempts = 100
 
         while (attempts < maxAttempts) {
             const currentUrl = page.url()
@@ -181,14 +181,14 @@ app.post('/expandGoogleUrl', async (req, res) => {
                         else if (buttons.length > 0) buttons[0].click()
                     })
                     // Wait briefly for navigation after clicking
-                    await new Promise((r) => setTimeout(r, 2000))
+                    await new Promise((r) => setTimeout(r, 500))
                 } catch (e) {
                     console.warn('[Consent] Failed to click consent button:', e.message)
                 }
             }
 
             // Wait 1 second before next check
-            await new Promise((r) => setTimeout(r, 1000))
+            await new Promise((r) => setTimeout(r, 200))
             attempts++
         }
 
