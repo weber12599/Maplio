@@ -135,7 +135,7 @@ app.post('/expandGoogleUrl', async (req, res) => {
 
         // 4. Navigate to the URL
         // We use 'domcontentloaded' for speed. We will handle the specific wait logic manually below.
-        await page.goto(shortUrl, { waitUntil: 'domcontentloaded', timeout: 30000 })
+        page.goto(shortUrl, { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {})
 
         // 5. Smart Wait Logic
         // We poll the URL to see if it has resolved to the final Google Maps format (coordinates).
@@ -196,38 +196,21 @@ app.post('/expandGoogleUrl', async (req, res) => {
         const finalUrl = page.url()
         console.log(`[Resolved] Final URL: ${finalUrl}`)
 
-        let coords = null
-
-        // Pattern 1: URL contains @lat,lng (standard view)
-        const atMatch = finalUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)
-        if (atMatch) {
-            coords = { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) }
-        }
-        // Pattern 2: URL contains query params ?q=lat,lng or &ll=lat,lng (search view)
-        else {
-            const queryMatch = finalUrl.match(/[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/)
-            if (queryMatch) {
-                coords = { lat: parseFloat(queryMatch[1]), lng: parseFloat(queryMatch[2]) }
-            }
-        }
-
-        const pageTitle = await page.title()
-
         // 7. Send Response
-        if (coords) {
+        if (
+            finalUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
+            finalUrl.match(/[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/)
+        ) {
             res.json({
                 success: true,
-                finalUrl: finalUrl,
-                coordinates: coords,
-                title: pageTitle
+                finalUrl: finalUrl
             })
         } else {
             // Even if no coordinates found, return the resolved URL (client might parse it differently)
             res.json({
                 success: true,
                 warning: 'Coordinates not found in the final URL',
-                finalUrl: finalUrl,
-                title: pageTitle
+                finalUrl: finalUrl
             })
         }
     } catch (error) {
@@ -252,3 +235,4 @@ getBrowser().then(() => {
         console.log(`Security enabled. API Key required for POST requests.`)
     })
 })
+
