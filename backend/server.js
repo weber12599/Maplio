@@ -115,6 +115,18 @@ app.post('/expandGoogleUrl', async (req, res) => {
         const browser = await getBrowser()
         page = await browser.newPage()
 
+        // 2.1 Block heavy resources
+        await page.setRequestInterception(true)
+        page.on('request', (req) => {
+            const resourceType = req.resourceType()
+            // Block images, fonts, styles, media to save bandwidth and CPU
+            if (['image', 'stylesheet', 'font', 'media', 'imageset'].includes(resourceType)) {
+                req.abort()
+            } else {
+                req.continue()
+            }
+        })
+
         // 3. Set User-Agent
         // Spoof a standard desktop browser to avoid being served the mobile "Lite" version of Maps
         await page.setUserAgent(
@@ -240,4 +252,3 @@ getBrowser().then(() => {
         console.log(`Security enabled. API Key required for POST requests.`)
     })
 })
-
