@@ -31,7 +31,7 @@
             />
 
             <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                <template v-if="query">
+                <template v-if="query || results?.length > 0">
                     <button
                         @click="clear"
                         :class="[
