@@ -20,11 +20,9 @@
                 ></i>
             </div>
 
-            <input
+            <composition-input
                 v-model="query"
-                @compositionstart="handleCompositionStart"
-                @compositionend="handleCompositionEnd"
-                @keyup.enter="handleEnter"
+                @enter="handleSearch"
                 :placeholder="$t('planner.search_placeholder')"
                 :class="[
                     'w-full pl-12 pr-12 py-4 rounded-2xl text-sm outline-none border transition-all duration-500 shadow-sm',
@@ -89,6 +87,7 @@
 <script setup>
 import { parseGoogleMapUrl } from '@/utils/mapUtils'
 import { ref } from 'vue'
+import CompositionInput from '@/components/Common/CompositionInput.vue'
 
 defineProps({
     results: Array,
@@ -99,7 +98,6 @@ defineProps({
 const emit = defineEmits(['search', 'select', 'clear'])
 
 const query = ref('')
-const isComposing = ref(false)
 
 const handlePaste = async () => {
     try {
@@ -120,21 +118,6 @@ const searchOnGoogleMaps = () => {
     const keyword = encodeURIComponent(query.value)
     const url = `https://www.google.com/maps/search/?api=1&query=${keyword}`
     window.open(url, '_blank')
-}
-
-const handleCompositionStart = () => {
-    isComposing.value = true
-}
-
-const handleCompositionEnd = () => {
-    setTimeout(() => {
-        isComposing.value = false
-    }, 0)
-}
-
-const handleEnter = (e) => {
-    if (isComposing.value || e.isComposing) return
-    handleSearch()
 }
 
 const handleSearch = () => {
