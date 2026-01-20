@@ -63,9 +63,9 @@
                 </h3>
 
                 <div class="flex gap-2">
-                    <input
+                    <composition-input
                         v-model="newTodoText"
-                        @keyup.enter="addTodo"
+                        @enter="addTodo"
                         type="text"
                         :placeholder="$t('planner.add_todo_placeholder')"
                         :class="[
@@ -113,12 +113,12 @@
                         </div>
 
                         <div class="flex-grow">
-                            <input
+                            <composition-input
                                 v-if="editingTodo === todo"
                                 ref="activeInputRef"
                                 v-model="todo.text"
                                 @blur="finishEditTodo"
-                                @keyup.enter="finishEditTodo"
+                                @enter="finishEditTodo"
                                 type="text"
                                 class="w-full bg-transparent outline-none border-b border-blue-400"
                             />
@@ -184,6 +184,7 @@
 import { formatNote } from '@/utils/stringUtils'
 import { ref, watch, onMounted, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
+import CompositionInput from '@/components/Common/CompositionInput.vue'
 
 const props = defineProps({
     summary: String,
