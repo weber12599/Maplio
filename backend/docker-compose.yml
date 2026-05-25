@@ -1,11 +1,13 @@
+version: '3.8'
+
 services:
     maplio-api:
         build:
             context: .
             dockerfile: Dockerfile
         container_name: maplio-api-server
-        ports:
-            - '3000:3000'
+        network_mode: host
         restart: always
-        env_file:
-            - .env
+        environment:
+            - API_KEY=${API_KEY}
+            - CORS_ORIGIN=${CORS_ORIGIN}
