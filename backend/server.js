@@ -4,6 +4,7 @@ const cors = require('cors')
 const rateLimit = require('express-rate-limit')
 
 const app = express()
+app.set('trust proxy', 1)
 // Default port is 3000, or use the environment variable
 const PORT = process.env.PORT || 3000
 
