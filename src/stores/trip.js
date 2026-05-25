@@ -49,7 +49,12 @@ export const useTripStore = defineStore('trip', () => {
 
         if (authStore.isDemoMode) {
             const data = localStorage.getItem('maplio_demo_data')
-            trips.value = data ? JSON.parse(data) : []
+            try {
+                trips.value = data ? JSON.parse(data) : []
+            } catch (e) {
+                console.error('[trip] Failed to parse demo data from localStorage:', e)
+                trips.value = []
+            }
             isTripsLoading.value = false
             return
         }
@@ -86,7 +91,11 @@ export const useTripStore = defineStore('trip', () => {
             if (trips.value.length === 0) {
                 const data = localStorage.getItem('maplio_demo_data')
                 if (data) {
-                    trips.value = JSON.parse(data)
+                    try {
+                        trips.value = JSON.parse(data)
+                    } catch (e) {
+                        console.error('[trip] Failed to parse demo data in checkAndJoinTrip:', e)
+                    }
                 }
             }
 

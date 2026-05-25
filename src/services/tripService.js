@@ -19,13 +19,19 @@ export const subscribeTrips = (userId, callback) => {
         where('members', 'array-contains', userId),
         orderBy('createdAt', 'desc')
     )
-    return onSnapshot(q, (snap) => {
-        callback(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-    })
+    return onSnapshot(
+        q,
+        (snap) => {
+            callback(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
+        },
+        (error) => {
+            console.error('[tripService] Firestore onSnapshot error:', error)
+        }
+    )
 }
 
 export const saveTripData = async (tripId, data) => {
-    await setDoc(doc(db, 'trips', tripId), data)
+    await setDoc(doc(db, 'trips', tripId), data, { merge: true })
 }
 
 export const deleteTripDoc = async (tripId) => {

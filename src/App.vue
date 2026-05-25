@@ -93,6 +93,7 @@ watch(
 )
 
 const handleLogout = async () => {
+    tripStore.stopTripsListener()
     await authStore.logout()
     router.push('/login')
 }
@@ -123,7 +124,12 @@ const handleImportTrip = async () => {
         if (!text) return
 
         const importedData = JSON.parse(text)
-        if (!importedData.name || !Array.isArray(importedData.itinerary)) {
+        if (
+            !importedData.name ||
+            !Array.isArray(importedData.itinerary) ||
+            importedData.itinerary.length === 0 ||
+            !importedData.itinerary.every((day) => Array.isArray(day.spots))
+        ) {
             throw new Error(t('app.import_invalid'))
         }
 
