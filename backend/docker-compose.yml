@@ -1,0 +1,11 @@
+services:
+    maplio-api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: maplio-api-server
+        ports:
+            - '3000:3000'
+        restart: always
+        env_file:
+            - .env
