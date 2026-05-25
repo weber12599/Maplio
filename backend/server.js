@@ -1,6 +1,7 @@
 const express = require('express')
 const puppeteer = require('puppeteer')
 const cors = require('cors')
+const rateLimit = require('express-rate-limit')
 
 const app = express()
 // Default port is 3000, or use the environment variable
@@ -13,10 +14,25 @@ const PORT = process.env.PORT || 3000
 // Define your secret API Key here.
 // In production, it is recommended to pass this via the Docker environment variable "API_KEY".
 // Example: docker run -e API_KEY=my_secret_password ...
-const MY_API_KEY = process.env.API_KEY || 'maplio_secret_key_999'
+if (!process.env.API_KEY) {
+    console.error('FATAL: Missing API_KEY environment variable. Exiting.')
+    process.exit(1)
+}
+const MY_API_KEY = process.env.API_KEY
 
 // Enable Cross-Origin Resource Sharing (CORS) to allow requests from your frontend
-app.use(cors())
+const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173'
+app.use(cors({ origin: corsOrigin }))
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later.' }
+})
+app.use('/expandGoogleUrl', limiter)
 
 // Parse incoming JSON payloads
 app.use(express.json())
@@ -92,7 +108,7 @@ app.use((req, res, next) => {
  * GET /
  */
 app.get('/', (req, res) => {
-    res.send('Maplio API is secure and running on Synology NAS!')
+    res.send('Maplio API is secure and running on the server!')
 })
 
 /**
@@ -106,6 +122,25 @@ app.post('/expandGoogleUrl', async (req, res) => {
     // 1. Validate input
     if (!shortUrl) {
         return res.status(400).json({ error: 'Missing "url" parameter in request body' })
+    }
+
+    // 1.1 Validate URL is from an allowed Google Maps domain
+    let parsedUrl
+    try {
+        parsedUrl = new URL(shortUrl)
+    } catch {
+        return res.status(400).json({ error: 'Invalid URL format' })
+    }
+    const allowedHostnames = [
+        'maps.google.com',
+        'maps.app.goo.gl',
+        'goo.gl',
+        'google.com',
+        'www.google.com'
+    ]
+    if (!allowedHostnames.includes(parsedUrl.hostname)) {
+        console.warn(`[Security] Blocked disallowed hostname: ${parsedUrl.hostname}`)
+        return res.status(400).json({ error: 'URL not from an allowed domain' })
     }
 
     console.log(`[Processing] URL: ${shortUrl}`)
@@ -217,8 +252,7 @@ app.post('/expandGoogleUrl', async (req, res) => {
         console.error('[Error] Puppeteer execution failed:', error)
 
         res.status(500).json({
-            error: 'Internal Server Error',
-            details: error.message
+            error: 'Internal Server Error'
         })
     } finally {
         // Only close the page, NOT the browser
@@ -235,4 +269,3 @@ getBrowser().then(() => {
         console.log(`Security enabled. API Key required for POST requests.`)
     })
 })
-

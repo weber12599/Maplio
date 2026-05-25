@@ -4,11 +4,11 @@ source .env.api
 
 docker stop maplio-server
 docker rm maplio-server
-docker build --no-cache --network=host -t maplio-api .
+docker build --no-cache -t maplio-api .
 
 docker run -d \
   --name maplio-server \
-  --network=host \
+  -p 3000:3000 \
   --restart always \
   -e API_KEY=$X_API_KEY \
   maplio-api

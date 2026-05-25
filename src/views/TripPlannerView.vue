@@ -107,7 +107,6 @@
                         @touchstart="handleTouchStart"
                         @touchmove="handleTouchMove"
                         @touchend="handleTouchEnd"
-                        @wheel="handleWheel"
                     >
                         <SearchBar
                             ref="searchBar"
@@ -425,7 +424,7 @@ const handleLocationSelect = (res) => {
         name: res.display_name.split(',')[0],
         lat: isNaN(lat) ? null : lat,
         lng: isNaN(lng) ? null : lng,
-        url: `http://googleusercontent.com/maps.google.com/?q=${lat},${lng}`,
+        url: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`,
         notes: '',
         timeStart: '',
         timeEnd: '',
@@ -513,7 +512,7 @@ const executeCopySpot = async (targetDayIndexes) => {
 
 const openSpotOnMaps = (spot) => {
     window.open(
-        spot.url || `http://googleusercontent.com/maps.google.com/?q=${spot.lat},${spot.lng}`,
+        spot.url || `https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}`,
         '_blank'
     )
 }

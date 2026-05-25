@@ -258,6 +258,22 @@
                             </button>
                         </div>
 
+                        <div
+                            v-if="searchProvider === 'google'"
+                            class="h-px my-1 mx-2 opacity-10 bg-current"
+                        ></div>
+
+                        <button
+                            v-if="searchProvider === 'google'"
+                            @click="openBackendConfig"
+                            :class="themes[currentTheme].menuItemClass"
+                        >
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-gear w-5 text-center"></i>
+                                {{ $t('app.configure_backend') }}
+                            </div>
+                        </button>
+
                         <div class="h-px my-1 mx-2 opacity-10 bg-current"></div>
 
                         <button
@@ -290,6 +306,99 @@
                         </button>
                     </div>
                 </transition>
+            </div>
+        </div>
+
+        <!-- Backend Config Dialog -->
+        <div
+            v-if="isBackendConfigOpen"
+            :class="[
+                'fixed inset-0 z-[30000] flex items-center justify-center p-4 transition-colors duration-500',
+                currentTheme === 'dark' ? 'bg-black/50' : 'bg-white/30'
+            ]"
+            @click="closeBackendConfig"
+        >
+            <div
+                :class="[
+                    'w-full max-w-md rounded-2xl p-6 border transition-all duration-500 space-y-4',
+                    currentTheme === 'dark'
+                        ? 'bg-slate-800 border-slate-700 text-slate-100'
+                        : 'bg-white border-stone-200 text-stone-900'
+                ]"
+                @click.stop
+            >
+                <h3 class="text-lg font-bold">{{ $t('app.configure_backend') }}</h3>
+
+                <div class="space-y-4">
+                    <!-- Backend URL -->
+                    <div>
+                        <label
+                            :class="[
+                                'text-xs font-bold uppercase ml-1 mb-2 block transition-colors',
+                                currentTheme === 'dark' ? 'text-slate-400' : 'text-stone-500'
+                            ]"
+                        >
+                            {{ $t('app.backend_url') }}
+                        </label>
+                        <input
+                            v-model="tempBackendUrl"
+                            type="url"
+                            placeholder="http://localhost:3000"
+                            :class="[
+                                'w-full rounded-lg px-3 py-2 outline-none border transition-all text-sm',
+                                currentTheme === 'dark'
+                                    ? 'bg-slate-700 border-slate-600 text-slate-100 focus:ring-blue-400'
+                                    : 'bg-stone-50 border-stone-300 text-stone-900 focus:ring-blue-400'
+                            ]"
+                            @keyup.enter="saveBackendConfig"
+                        />
+                    </div>
+
+                    <!-- API Key -->
+                    <div>
+                        <label
+                            :class="[
+                                'text-xs font-bold uppercase ml-1 mb-2 block transition-colors',
+                                currentTheme === 'dark' ? 'text-slate-400' : 'text-stone-500'
+                            ]"
+                        >
+                            {{ $t('app.backend_key') }}
+                        </label>
+                        <input
+                            v-model="tempBackendApiKey"
+                            type="password"
+                            placeholder="API Key"
+                            :class="[
+                                'w-full rounded-lg px-3 py-2 outline-none border transition-all text-sm',
+                                currentTheme === 'dark'
+                                    ? 'bg-slate-700 border-slate-600 text-slate-100 focus:ring-blue-400'
+                                    : 'bg-stone-50 border-stone-300 text-stone-900 focus:ring-blue-400'
+                            ]"
+                            @keyup.enter="saveBackendConfig"
+                        />
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3 pt-2">
+                    <button
+                        @click="closeBackendConfig"
+                        :class="[
+                            'flex-1 px-4 py-2 rounded-lg font-bold transition-all text-sm',
+                            currentTheme === 'dark'
+                                ? 'bg-slate-700 text-slate-100 hover:bg-slate-600'
+                                : 'bg-stone-200 text-stone-900 hover:bg-stone-300'
+                        ]"
+                    >
+                        {{ $t('common.cancel') }}
+                    </button>
+                    <button
+                        @click="saveBackendConfig"
+                        class="flex-1 px-4 py-2 rounded-lg font-bold transition-all text-sm bg-blue-500 text-white hover:bg-blue-600 active:scale-95"
+                    >
+                        {{ $t('common.confirm') }}
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -329,6 +438,11 @@ const { t, locale } = useI18n()
 const isMenuOpen = ref(false)
 const subMenu = ref(null)
 const searchProvider = ref(localStorage.getItem('maplio_search_provider') || 'google')
+const isBackendConfigOpen = ref(false)
+const backendUrl = ref(localStorage.getItem('maplio_backend_url') || '')
+const backendApiKey = ref(localStorage.getItem('maplio_backend_key') || '')
+const tempBackendUrl = ref('')
+const tempBackendApiKey = ref('')
 
 const logoSrc = computed(() => {
     return props.currentTheme === 'muji' ? logoDefault : logoDark
@@ -357,6 +471,24 @@ const setLang = (langCode) => {
 const setSearchProvider = (provider) => {
     searchProvider.value = provider
     localStorage.setItem('maplio_search_provider', provider)
+}
+
+const openBackendConfig = () => {
+    tempBackendUrl.value = backendUrl.value
+    tempBackendApiKey.value = backendApiKey.value
+    isBackendConfigOpen.value = true
+}
+
+const saveBackendConfig = () => {
+    backendUrl.value = tempBackendUrl.value.trim()
+    backendApiKey.value = tempBackendApiKey.value.trim()
+    localStorage.setItem('maplio_backend_url', backendUrl.value)
+    localStorage.setItem('maplio_backend_key', backendApiKey.value)
+    isBackendConfigOpen.value = false
+}
+
+const closeBackendConfig = () => {
+    isBackendConfigOpen.value = false
 }
 
 const showVersionInfo = () => {
