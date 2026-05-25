@@ -5,7 +5,7 @@
                 class="absolute left-0 top-0 h-full w-12 flex items-center justify-center pointer-events-none z-10"
             >
                 <i
-                    v-if="!loading"
+                    v-if="!loading && !expanding"
                     :class="[
                         'fa-solid fa-magnifying-glass transition-colors',
                         themeConfig.searchIconClass
@@ -98,6 +98,20 @@ defineProps({
 const emit = defineEmits(['search', 'select', 'clear'])
 
 const query = ref('')
+const expanding = ref(false)
+
+const GOOGLE_MAPS_HOSTNAMES = new Set([
+    'maps.google.com', 'maps.app.goo.gl', 'goo.gl',
+    'google.com', 'www.google.com'
+])
+
+const isGoogleMapsUrl = (str) => {
+    try {
+        return GOOGLE_MAPS_HOSTNAMES.has(new URL(str).hostname)
+    } catch {
+        return false
+    }
+}
 
 const handlePaste = async () => {
     try {
@@ -120,22 +134,53 @@ const searchOnGoogleMaps = () => {
     window.open(url, '_blank')
 }
 
-const handleSearch = () => {
-    if (parseGoogleMapUrl(query.value)) {
-        emit('search', query.value)
+const handleSearch = async () => {
+    const q = query.value.trim()
+    if (!q) return
+
+    // Already has parseable coords → pass through
+    if (parseGoogleMapUrl(q)) {
+        emit('search', q)
         return
     }
 
-    switch (localStorage.getItem('maplio_search_provider')) {
-        case 'google':
-            searchOnGoogleMaps()
-            break
-        case 'osm':
-            emit('search', query.value)
-            break
-        default:
-            searchOnGoogleMaps()
-            break
+    // Short / full Google Maps URL — try backend expansion
+    if (isGoogleMapsUrl(q)) {
+        const backendUrl = localStorage.getItem('maplio_backend_url')
+        const backendKey = localStorage.getItem('maplio_backend_key')
+        if (backendUrl) {
+            expanding.value = true
+            try {
+                const res = await fetch(`${backendUrl}/expandGoogleUrl`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': backendKey || ''
+                    },
+                    body: JSON.stringify({ url: q })
+                })
+                const data = await res.json()
+                if (data.success && data.finalUrl) {
+                    emit('search', data.finalUrl)
+                    return
+                }
+            } catch {
+                // network error — fall through to url_only
+            } finally {
+                expanding.value = false
+            }
+        }
+        // No backend configured or expansion failed → url_only
+        emit('search', q)
+        return
+    }
+
+    // Plain keyword
+    const provider = localStorage.getItem('maplio_search_provider') ?? 'google'
+    if (provider === 'osm') {
+        emit('search', q)
+    } else {
+        searchOnGoogleMaps()
     }
 }
 
