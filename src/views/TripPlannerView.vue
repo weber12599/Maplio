@@ -135,7 +135,18 @@
                                     @copy="initiateCopySpot"
                                     @remove="handleRemoveSpot(index)"
                                     @open-map="openSpotOnMaps"
-                                    @update-data="tripStore.saveData"
+                                    @update:showOnMap="
+                                        (value) => {
+                                            element.showOnMap = value
+                                            tripStore.saveData()
+                                        }
+                                    "
+                                    @update:travelMode="
+                                        (value) => {
+                                            element.travelMode = value
+                                            tripStore.saveData()
+                                        }
+                                    "
                                     @edit-transport="startEditTransport"
                                     @navigate="
                                         handleNavigate(
