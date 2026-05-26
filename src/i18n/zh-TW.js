@@ -140,6 +140,7 @@ export default {
         btn_create: '建立行程',
         btn_creating: '建立中...',
         error_incomplete: '請填寫完整資訊',
+        error_invalid_duration: '天數至少需為 1 天',
         error_failed: '建立失敗，請稍後再試'
     },
     trip_card: {
