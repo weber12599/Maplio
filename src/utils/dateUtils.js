@@ -2,7 +2,8 @@ import i18n from '../i18n'
 
 export const getDayDate = (startDate, dayIndex) => {
     if (!startDate) return ''
-    const date = new Date(startDate)
+    const [year, month, day] = startDate.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
     date.setDate(date.getDate() + dayIndex)
 
     const currentLocale = i18n.global.locale.value
