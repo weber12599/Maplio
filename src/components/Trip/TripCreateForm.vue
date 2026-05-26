@@ -101,9 +101,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { collection, addDoc } from 'firebase/firestore'
-import { db } from '../../firebase'
 import { useTripStore } from '../../stores/trip'
+import { createTrip } from '../../services/tripService'
 
 const props = defineProps({
     isDemo: Boolean,
@@ -153,7 +152,7 @@ const handleCreate = async () => {
             tripData.id = 'demo_' + Date.now()
             tripStore.addLocalTrip(tripData)
         } else {
-            await addDoc(collection(db, 'trips'), tripData)
+            await createTrip(tripData)
         }
 
         emit('created')
