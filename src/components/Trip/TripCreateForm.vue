@@ -62,7 +62,7 @@
                         >
                         <input
                             type="number"
-                            v-model="newTrip.duration"
+                            v-model.number="newTrip.duration"
                             min="1"
                             :class="[
                                 'w-full rounded-xl px-4 py-3 outline-none border transition-all',
@@ -133,6 +133,10 @@ const resetForm = () => {
 const handleCreate = async () => {
     if (!newTrip.value.name || !newTrip.value.startDate) {
         return alert(t('trip_form.error_incomplete'))
+    }
+
+    if (!newTrip.value.duration || newTrip.value.duration < 1) {
+        return alert(t('trip_form.error_invalid_duration'))
     }
 
     isSubmitting.value = true

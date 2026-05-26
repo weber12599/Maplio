@@ -140,6 +140,7 @@ export default {
         btn_create: 'Create Trip',
         btn_creating: 'Creating...',
         error_incomplete: 'Please fill in all information',
+        error_invalid_duration: 'Duration must be at least 1 day',
         error_failed: 'Creation failed, please try again later'
     },
     trip_card: {
