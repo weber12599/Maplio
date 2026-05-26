@@ -10,7 +10,8 @@ import {
     deleteDoc,
     getDoc,
     updateDoc,
-    arrayUnion
+    arrayUnion,
+    addDoc
 } from 'firebase/firestore'
 
 export const subscribeTrips = (userId, callback) => {
@@ -49,4 +50,9 @@ export const joinTrip = async (tripId, userId) => {
     await updateDoc(docRef, {
         members: arrayUnion(userId)
     })
+}
+
+export const createTrip = async (tripData) => {
+    const docRef = await addDoc(collection(db, 'trips'), tripData)
+    return docRef.id
 }
