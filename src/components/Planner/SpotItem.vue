@@ -17,9 +17,9 @@
                     <div class="flex items-center gap-2">
                         <input
                             type="checkbox"
-                            v-model="spot.showOnMap"
+                            :checked="spot.showOnMap"
                             :disabled="!spot.lat"
-                            @change="$emit('update-data')"
+                            @change="handleShowOnMapChange"
                             class="w-4 h-4 rounded border-stone-300 bg-white text-stone-800 focus:ring-stone-500 disabled:opacity-20 cursor-pointer"
                         />
 
@@ -131,8 +131,8 @@
 
             <div class="flex items-center gap-3 w-full px-8">
                 <select
-                    v-model="spot.travelMode"
-                    @change="$emit('update-data')"
+                    :value="spot.travelMode"
+                    @change="handleTravelModeChange"
                     :class="[
                         'text-[10px] border rounded-xl px-2 py-1 outline-none font-bold shadow-sm transition-all cursor-pointer w-11 md:w-auto',
                         themeConfig.transportSelectClass
@@ -217,7 +217,8 @@ const emit = defineEmits([
     'copy',
     'remove',
     'open-map',
-    'update-data',
+    'update:showOnMap',
+    'update:travelMode',
     'edit-transport',
     'navigate'
 ])
@@ -240,6 +241,14 @@ const confirmRemove = () => {
     if (confirm(t('planner.delete_spot_confirm'))) {
         emit('remove')
     }
+}
+
+const handleShowOnMapChange = (event) => {
+    emit('update:showOnMap', event.target.checked)
+}
+
+const handleTravelModeChange = (event) => {
+    emit('update:travelMode', event.target.value)
 }
 
 const toggleExpand = () => {
