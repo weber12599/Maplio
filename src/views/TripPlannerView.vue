@@ -72,7 +72,7 @@
                 </div>
 
                 <LeafletMap
-                    v-show="viewMode === 'map'"
+                    v-if="viewMode === 'map'"
                     mapId="mobile-map"
                     :spots="tripStore.currentDaySpots"
                     :currentTheme="themeStore.activeTheme"
@@ -226,7 +226,7 @@
             </div>
 
             <LeafletMap
-                v-show="viewMode === 'map'"
+                v-if="viewMode === 'map'"
                 mapId="desktop-map"
                 :spots="tripStore.currentDaySpots"
                 :currentTheme="themeStore.activeTheme"
