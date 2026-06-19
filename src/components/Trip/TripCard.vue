@@ -18,9 +18,22 @@
                     <span class="opacity-30">·</span>
                     <span>{{ trip.itinerary.length }} {{ $t('common.days') }}</span>
                 </div>
+                <div v-if="userRole && userRole !== 'owner'" class="mt-2">
+                    <span
+                        :class="[
+                            'text-[9px] px-2 py-0.5 rounded-full font-bold uppercase border inline-block',
+                            userRole === 'editor'
+                                ? 'border-blue-500/30 text-blue-500'
+                                : 'border-stone-400/30 text-stone-400'
+                        ]"
+                    >
+                        {{ $t(`members.role_${userRole}`) }}
+                    </span>
+                </div>
             </div>
             <div class="mt-8 flex justify-between items-center">
                 <button
+                    v-if="userRole === 'owner' || userRole === null"
                     @click.stop="confirmDelete"
                     class="opacity-30 hover:opacity-100 hover:text-red-500 transition-all"
                 >
@@ -51,6 +64,10 @@ const props = defineProps({
     themeConfig: {
         type: Object,
         required: true
+    },
+    userRole: {
+        type: String,
+        default: null
     }
 })
 

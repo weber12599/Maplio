@@ -69,6 +69,48 @@
                 </button>
             </div>
 
+            <!-- 邀請成員區塊 -->
+            <div
+                v-if="['owner', 'editor'].includes(currentUserRole)"
+                class="mt-6 pt-6 border-t space-y-2"
+                :class="themeConfig.secondaryBorderClass"
+            >
+                <p class="text-xs font-bold opacity-60 mb-3">
+                    {{ $t('planner.share_dialog.invite_section') }}
+                </p>
+                <button
+                    v-if="currentUserRole === 'owner'"
+                    @click="copyInviteLink('editor')"
+                    :class="[
+                        'w-full px-4 py-2 rounded-lg text-sm font-bold transition-all',
+                        copiedRole === 'editor'
+                            ? 'bg-green-500/20 text-green-600'
+                            : themeConfig.primaryBtnClass
+                    ]"
+                >
+                    {{
+                        copiedRole === 'editor'
+                            ? $t('planner.share_dialog.copied')
+                            : $t('planner.share_dialog.invite_editor')
+                    }}
+                </button>
+                <button
+                    @click="copyInviteLink('viewer')"
+                    :class="[
+                        'w-full px-4 py-2 rounded-lg text-sm font-bold transition-all',
+                        copiedRole === 'viewer'
+                            ? 'bg-green-500/20 text-green-600'
+                            : themeConfig.primaryBtnClass
+                    ]"
+                >
+                    {{
+                        copiedRole === 'viewer'
+                            ? $t('planner.share_dialog.copied')
+                            : $t('planner.share_dialog.invite_viewer')
+                    }}
+                </button>
+            </div>
+
             <button
                 @click="$emit('cancel')"
                 class="w-full mt-6 py-3 text-sm font-bold opacity-40 hover:opacity-100 transition-opacity"
@@ -80,14 +122,45 @@
 </template>
 
 <script setup>
-defineProps({
+import { ref } from 'vue'
+
+const props = defineProps({
     themeConfig: {
         type: Object,
         required: true
+    },
+    currentUserRole: {
+        type: String,
+        default: null
+    },
+    trip: {
+        type: Object,
+        default: null
     }
 })
 
 defineEmits(['cancel', 'choice'])
+
+const copiedRole = ref(null)
+
+const generateInviteLink = (role) => {
+    if (!props.trip) return ''
+    const base = window.location.origin + '/trip/' + props.trip.id
+    return `${base}?role=${role}`
+}
+
+const copyInviteLink = async (role) => {
+    const url = generateInviteLink(role)
+    try {
+        await navigator.clipboard.writeText(url)
+        copiedRole.value = role
+        setTimeout(() => {
+            copiedRole.value = null
+        }, 2000)
+    } catch (err) {
+        console.error('Failed to copy invite link:', err)
+    }
+}
 </script>
 
 <style scoped>

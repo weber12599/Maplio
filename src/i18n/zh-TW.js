@@ -61,6 +61,7 @@ export default {
         tab_summary: '摘要',
         tab_todo: '待辦事項',
         tab_notes: '筆記',
+        tab_members: '成員',
         empty_day_hint: '今天還沒安排行程，試試搜尋景點吧！',
         delete_day_btn: '刪除 Day {day} 整天行程',
         not_found: '找不到此行程或無權限查看',
@@ -112,7 +113,11 @@ export default {
             link_title: '分享旅程連結',
             link_desc: '適合已加入成員的使用者',
             json_title: '匯出 JSON 原始資料',
-            json_desc: '適合備份或手動匯入'
+            json_desc: '適合備份或手動匯入',
+            invite_section: '邀請成員',
+            invite_viewer: '複製檢視連結',
+            invite_editor: '複製編輯連結',
+            copied: '連結已複製！'
         },
         spot_dialog: {
             title: '景點詳細資訊',
@@ -145,6 +150,19 @@ export default {
     },
     trip_card: {
         delete_confirm: '確定要刪除行程 "{name}" 嗎？此動作無法復原。'
+    },
+    members: {
+        title: '成員管理',
+        role_owner: '擁有者',
+        role_editor: '編輯者',
+        role_viewer: '檢視者',
+        viewer_badge: '唯讀模式',
+        invite_section: '邀請連結',
+        invite_viewer: '複製檢視連結',
+        invite_editor: '複製編輯連結',
+        copied: '連結已複製！',
+        confirm_remove: '確定移除此成員？',
+        remove_btn: '移除'
     },
     theme: {
         muji: '淺色',

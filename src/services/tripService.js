@@ -11,6 +11,8 @@ import {
     getDoc,
     updateDoc,
     arrayUnion,
+    arrayRemove,
+    deleteField,
     addDoc
 } from 'firebase/firestore'
 
@@ -45,10 +47,30 @@ export const getTripDoc = async (tripId) => {
     return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null
 }
 
-export const joinTrip = async (tripId, userId) => {
+export const joinTrip = async (tripId, userId, role = 'viewer', profile = null) => {
     const docRef = doc(db, 'trips', tripId)
     await updateDoc(docRef, {
-        members: arrayUnion(userId)
+        members: arrayUnion(userId),
+        [`permissions.${userId}`]: role,
+        [`memberProfiles.${userId}`]: {
+            displayName: profile?.displayName || null,
+            photoURL: profile?.photoURL || null
+        }
+    })
+}
+
+export const updateMemberRole = async (tripId, userId, newRole) => {
+    const docRef = doc(db, 'trips', tripId)
+    await updateDoc(docRef, {
+        [`permissions.${userId}`]: newRole
+    })
+}
+
+export const removeMember = async (tripId, userId) => {
+    const docRef = doc(db, 'trips', tripId)
+    await updateDoc(docRef, {
+        members: arrayRemove(userId),
+        [`permissions.${userId}`]: deleteField()
     })
 }
 

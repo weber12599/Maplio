@@ -61,6 +61,7 @@ export default {
         tab_summary: 'Summary',
         tab_todo: 'Todo',
         tab_notes: 'Notes',
+        tab_members: 'Members',
         empty_day_hint: 'No plans for today yet. Try searching for spots!',
         delete_day_btn: 'Delete Day {day} Itinerary',
         not_found: 'Trip not found or access denied',
@@ -112,7 +113,11 @@ export default {
             link_title: 'Share Trip Link',
             link_desc: 'For existing members',
             json_title: 'Export JSON Data',
-            json_desc: 'For backup or manual import'
+            json_desc: 'For backup or manual import',
+            invite_section: 'Invite Members',
+            invite_viewer: 'Copy Viewer Link',
+            invite_editor: 'Copy Editor Link',
+            copied: 'Link copied!'
         },
         spot_dialog: {
             title: 'Spot Details',
@@ -146,6 +151,19 @@ export default {
     trip_card: {
         delete_confirm:
             'Are you sure you want to delete trip "{name}"? This action cannot be undone.'
+    },
+    members: {
+        title: 'Members',
+        role_owner: 'Owner',
+        role_editor: 'Editor',
+        role_viewer: 'Viewer',
+        viewer_badge: 'Read-only view',
+        invite_section: 'Invite Link',
+        invite_viewer: 'Copy Viewer Link',
+        invite_editor: 'Copy Editor Link',
+        copied: 'Link copied!',
+        confirm_remove: 'Remove this member?',
+        remove_btn: 'Remove'
     },
     theme: {
         muji: 'Light',
