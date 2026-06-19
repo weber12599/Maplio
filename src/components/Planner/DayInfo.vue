@@ -16,7 +16,7 @@
 
                 <div class="relative group">
                     <textarea
-                        v-if="isEditingSummary"
+                        v-if="canEdit && isEditingSummary"
                         ref="summaryInputRef"
                         v-model="localSummary"
                         @input="handleSummaryInput"
@@ -29,18 +29,19 @@
                     ></textarea>
 
                     <div
-                        v-else
-                        @click="handleViewClick"
                         :class="[
-                            'w-full h-32 p-4 rounded-xl transition-all shadow-sm cursor-text overflow-y-auto break-words whitespace-pre-wrap',
+                            'w-full h-32 p-4 rounded-xl transition-all shadow-sm overflow-y-auto break-words whitespace-pre-wrap',
                             themeConfig.inputClass,
-                            !localSummary ? 'text-stone-400 italic' : ''
+                            !localSummary ? 'text-stone-400 italic' : '',
+                            canEdit ? 'cursor-text' : ''
                         ]"
+                        @click="canEdit && handleViewClick"
                     >
                         <span v-if="localSummary" v-html="formattedSummary"></span>
                         <span v-else>{{ $t('planner.day_summary_placeholder') }}</span>
 
                         <div
+                            v-if="canEdit"
                             class="absolute top-2 right-2 opacity-0 group-hover:opacity-50 transition-opacity pointer-events-none"
                         >
                             <i class="fa-solid fa-pen text-xs"></i>
@@ -62,7 +63,7 @@
                     {{ $t('planner.todo_list') }}
                 </h3>
 
-                <div class="flex gap-2">
+                <div v-if="canEdit" class="flex gap-2">
                     <composition-input
                         v-model="newTodoText"
                         @enter="addTodo"
@@ -114,7 +115,7 @@
 
                         <div class="flex-grow">
                             <composition-input
-                                v-if="editingTodo === todo"
+                                v-if="canEdit && editingTodo === todo"
                                 ref="activeInputRef"
                                 v-model="todo.text"
                                 @blur="finishEditTodo"
@@ -123,16 +124,19 @@
                                 class="w-full bg-transparent outline-none border-b border-blue-400"
                             />
                             <span
-                                v-else
-                                @click="startEditTodo(todo)"
-                                class="block w-full cursor-text select-none"
-                                :class="todo.done ? 'line-through opacity-60' : ''"
+                                :class="[
+                                    'block w-full select-none',
+                                    todo.done ? 'line-through opacity-60' : '',
+                                    canEdit ? 'cursor-text' : ''
+                                ]"
+                                @click="canEdit && startEditTodo(todo)"
                             >
                                 {{ todo.text }}
                             </span>
                         </div>
 
                         <div
+                            v-if="canEdit"
                             class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                             <button
@@ -193,7 +197,8 @@ const props = defineProps({
     mode: {
         type: String,
         default: 'all'
-    }
+    },
+    canEdit: { type: Boolean, default: true }
 })
 
 const emit = defineEmits(['update'])
@@ -213,6 +218,7 @@ const formattedSummary = computed(() => {
 })
 
 const enableEdit = async () => {
+    if (!props.canEdit) return
     isEditingSummary.value = true
     await nextTick()
     if (summaryInputRef.value) {
@@ -266,6 +272,7 @@ const addTodo = () => {
 }
 
 const startEditTodo = async (todo) => {
+    if (!props.canEdit) return
     editingTodo.value = todo
     await nextTick()
     if (Array.isArray(activeInputRef.value) && activeInputRef.value.length > 0) {
@@ -286,6 +293,7 @@ const finishEditTodo = () => {
 }
 
 const toggleTodo = (todo) => {
+    if (!props.canEdit) return
     todo.done = !todo.done
     emitData()
 }

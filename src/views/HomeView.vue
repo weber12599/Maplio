@@ -24,6 +24,7 @@
                 :key="trip.id"
                 :trip="trip"
                 :themeConfig="activeThemeConfig"
+                :userRole="getUserRoleForTrip(trip)"
                 @select="handleSelectTrip"
                 @delete="tripStore.deleteTrip"
             />
@@ -58,6 +59,13 @@ const themeStore = useThemeStore()
 const authStore = useAuthStore()
 const { activeThemeConfig } = storeToRefs(themeStore)
 const { user, isDemoMode } = storeToRefs(authStore)
+
+const getUserRoleForTrip = (trip) => {
+    const uid = authStore.isDemoMode ? 'demo-user' : user.value?.uid
+    if (!uid) return null
+    if (!trip.permissions) return 'owner'
+    return trip.permissions[uid] || null
+}
 
 const handleSelectTrip = (trip) => {
     tripStore.selectTrip(trip.id)

@@ -69,6 +69,17 @@
                     >
                         <i class="fa-solid fa-list-check"></i>
                     </button>
+                    <button
+                        v-if="tripStore.currentTrip"
+                        @click="showMembersDialog = true"
+                        :title="$t('planner.tab_members')"
+                        :class="[
+                            'w-8 h-8 flex items-center justify-center rounded text-sm transition-colors',
+                            activeThemeConfig.tabInactiveClass
+                        ]"
+                    >
+                        <i class="fa-solid fa-user-group"></i>
+                    </button>
                 </div>
 
                 <LeafletMap
@@ -85,8 +96,17 @@
                     :summary="currentDayMeta.summary"
                     :todos="currentDayMeta.todos"
                     :themeConfig="activeThemeConfig"
+                    :canEdit="tripStore.canEdit"
                     @update="handleMetaUpdate"
                 />
+            </div>
+
+            <div
+                v-if="!tripStore.canEdit"
+                class="mx-6 mb-2 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 bg-amber-500/10 text-amber-600 border border-amber-500/20"
+            >
+                <i class="fa-solid fa-eye"></i>
+                {{ $t('members.viewer_badge') }}
             </div>
 
             <DayTabs
@@ -94,6 +114,7 @@
                 v-model:activeDay="tripStore.activeDay"
                 :startDate="tripStore.currentTrip.startDate"
                 :themeConfig="activeThemeConfig"
+                :canEdit="tripStore.canEdit"
                 @add-day="tripStore.addDay"
                 @delete-day="tripStore.removeDay"
             />
@@ -109,6 +130,7 @@
                         @touchend="handleTouchEnd"
                     >
                         <SearchBar
+                            v-if="tripStore.canEdit"
                             ref="searchBar"
                             :loading="isSearching"
                             :results="searchResults"
@@ -123,6 +145,7 @@
                             group="spots"
                             item-key="id"
                             handle=".drag-handle"
+                            :disabled="!tripStore.canEdit"
                             class="space-y-4"
                         >
                             <template #item="{ element, index }">
@@ -131,6 +154,7 @@
                                     :nextSpot="tripStore.currentDaySpots[index + 1]"
                                     :isLast="index === tripStore.currentDaySpots.length - 1"
                                     :themeConfig="activeThemeConfig"
+                                    :canEdit="tripStore.canEdit"
                                     @edit="startEditSpot"
                                     @copy="initiateCopySpot"
                                     @remove="handleRemoveSpot(index)"
@@ -223,6 +247,18 @@
                     <i class="fa-solid fa-clipboard-list"></i>
                     <span class="hidden lg:inline">{{ $t('planner.tab_notes') }}</span>
                 </button>
+                <button
+                    v-if="tripStore.currentTrip"
+                    @click="showMembersDialog = true"
+                    :title="$t('members.title')"
+                    :class="[
+                        'px-3 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2',
+                        activeThemeConfig.tabInactiveClass
+                    ]"
+                >
+                    <i class="fa-solid fa-user-group"></i>
+                    <span class="hidden lg:inline">{{ $t('planner.tab_members') }}</span>
+                </button>
             </div>
 
             <LeafletMap
@@ -239,6 +275,7 @@
                 :summary="currentDayMeta.summary"
                 :todos="currentDayMeta.todos"
                 :themeConfig="activeThemeConfig"
+                :canEdit="tripStore.canEdit"
                 @update="handleMetaUpdate"
             />
         </div>
@@ -268,8 +305,17 @@
         <ShareDialog
             v-if="showShareDialog"
             :themeConfig="activeThemeConfig"
+            :currentUserRole="tripStore.currentUserRole"
+            :trip="tripStore.currentTrip"
             @cancel="showShareDialog = false"
             @choice="handleShareChoice"
+        />
+        <MembersDialog
+            v-if="showMembersDialog && tripStore.currentTrip"
+            :themeConfig="activeThemeConfig"
+            :trip="tripStore.currentTrip"
+            :currentUserRole="tripStore.currentUserRole"
+            @close="showMembersDialog = false"
         />
     </div>
 
@@ -294,6 +340,7 @@ import LeafletMap from '../components/Map/LeafletMap.vue'
 import TransportDialog from '../components/Planner/TransportDialog.vue'
 import CopySpotDialog from '../components/Planner/CopySpotDialog.vue'
 import ShareDialog from '../components/Trip/ShareDialog.vue'
+import MembersDialog from '../components/Trip/MembersDialog.vue'
 import DayInfo from '../components/Planner/DayInfo.vue'
 
 import { useThemeStore } from '../stores/theme'
@@ -314,6 +361,7 @@ const showManualSpotForm = ref(false)
 const showTransportDialog = ref(false)
 const showCopyDialog = ref(false)
 const showShareDialog = ref(false)
+const showMembersDialog = ref(false)
 const manualSpot = ref({})
 const editingTransportSpot = ref(null)
 const spotToCopy = ref(null)
@@ -347,7 +395,8 @@ const loadTrip = async (id) => {
     if (!id) return
     isLoading.value = true
     try {
-        await tripStore.checkAndJoinTrip(id)
+        const inviteRole = route.query.role || null
+        await tripStore.checkAndJoinTrip(id, inviteRole)
     } finally {
         isLoading.value = false
     }

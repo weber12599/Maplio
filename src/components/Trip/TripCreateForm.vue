@@ -144,10 +144,18 @@ const handleCreate = async () => {
             spots: []
         }))
 
+        const uid = props.user ? props.user.uid : 'demo-user'
         const tripData = {
             name: newTrip.value.name,
             startDate: newTrip.value.startDate,
-            members: [props.user ? props.user.uid : 'demo-user'],
+            members: [uid],
+            permissions: { [uid]: 'owner' },
+            memberProfiles: {
+                [uid]: {
+                    displayName: props.user?.displayName || 'Demo User',
+                    photoURL: props.user?.photoURL || null
+                }
+            },
             itinerary,
             createdAt: props.isDemo ? new Date().toISOString() : new Date()
         }

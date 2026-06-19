@@ -18,7 +18,7 @@
                         <input
                             type="checkbox"
                             :checked="spot.showOnMap"
-                            :disabled="!spot.lat"
+                            :disabled="!spot.lat || !canEdit"
                             @change="handleShowOnMapChange"
                             class="w-4 h-4 rounded border-stone-300 bg-white text-stone-800 focus:ring-stone-500 disabled:opacity-20 cursor-pointer"
                         />
@@ -58,6 +58,7 @@
                         </span>
 
                         <button
+                            v-if="canEdit"
                             @click="$emit('copy', spot)"
                             class="opacity-30 hover:opacity-100 transition-opacity w-5 h-5 flex items-center justify-center"
                             :title="$t('planner.copy_spot_tooltip')"
@@ -66,6 +67,7 @@
                         </button>
 
                         <button
+                            v-if="canEdit"
                             @click="$emit('edit', spot)"
                             class="opacity-30 hover:opacity-100 transition-opacity"
                             :title="$t('planner.edit_spot_tooltip')"
@@ -117,6 +119,7 @@
                         <i class="fa-solid fa-location-dot text-xs"></i>
                     </button>
                     <button
+                        v-if="canEdit"
                         @click="confirmRemove"
                         class="w-10 h-10 flex items-center justify-center rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
                     >
@@ -133,6 +136,7 @@
                 <select
                     :value="spot.travelMode"
                     @change="handleTravelModeChange"
+                    :disabled="!canEdit"
                     :class="[
                         'text-[10px] border rounded-xl px-2 py-1 outline-none font-bold shadow-sm transition-all cursor-pointer w-11 md:w-auto',
                         themeConfig.transportSelectClass
@@ -146,6 +150,7 @@
 
                 <div class="flex-grow overflow-hidden">
                     <div
+                        v-if="canEdit"
                         @click="$emit('edit-transport', spot)"
                         class="flex-col justify-start font-bold text-[10px] opacity-50 hover:opacity-100 cursor-pointer py-1 truncate transition-opacity"
                     >
@@ -209,7 +214,8 @@ const props = defineProps({
     spot: Object,
     nextSpot: Object,
     isLast: Boolean,
-    themeConfig: Object
+    themeConfig: Object,
+    canEdit: { type: Boolean, default: true }
 })
 
 const emit = defineEmits([

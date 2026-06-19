@@ -20,6 +20,7 @@
                 <span class="text-[9px] font-bold opacity-60">{{ formatDate(index) }}</span>
             </button>
             <button
+                v-if="canEdit"
                 @click="$emit('add-day')"
                 :class="['px-4 py-2 rounded-2xl transition-colors', themeConfig.tabInactiveClass]"
             >
@@ -37,7 +38,8 @@ const props = defineProps({
     itinerary: Array,
     activeDay: Number,
     startDate: String,
-    themeConfig: Object
+    themeConfig: Object,
+    canEdit: { type: Boolean, default: true }
 })
 
 defineEmits(['update:activeDay', 'add-day'])
