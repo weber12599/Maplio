@@ -6,7 +6,8 @@ services:
             context: .
             dockerfile: Dockerfile
         container_name: maplio-api-server
-        network_mode: host
+        ports:
+            - '3000:3000'
         restart: always
         environment:
             - API_KEY=${API_KEY}
