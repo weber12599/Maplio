@@ -32,13 +32,23 @@
                 </div>
             </div>
             <div class="mt-8 flex justify-between items-center">
-                <button
-                    v-if="userRole === 'owner' || userRole === null"
-                    @click.stop="confirmDelete"
-                    class="opacity-30 hover:opacity-100 hover:text-red-500 transition-all"
-                >
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
+                <div class="flex items-center gap-4">
+                    <button
+                        v-if="canManage"
+                        @click.stop="editName"
+                        :title="$t('trip_card.edit_name')"
+                        class="opacity-30 hover:opacity-100 hover:text-blue-500 transition-all"
+                    >
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                        v-if="userRole === 'owner' || userRole === null"
+                        @click.stop="confirmDelete"
+                        class="opacity-30 hover:opacity-100 hover:text-red-500 transition-all"
+                    >
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
 
                 <div
                     :class="[
@@ -54,6 +64,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
@@ -71,13 +82,24 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['select', 'delete'])
+const emit = defineEmits(['select', 'delete', 'rename'])
 
 const { t } = useI18n()
+
+const canManage = computed(
+    () => ['owner', 'editor'].includes(props.userRole) || props.userRole === null
+)
 
 const confirmDelete = () => {
     if (confirm(t('trip_card.delete_confirm', { name: props.trip.name }))) {
         emit('delete', props.trip.id)
     }
+}
+
+const editName = () => {
+    const next = prompt(t('trip_card.rename_prompt'), props.trip.name)
+    if (next === null) return
+    const trimmed = next.trim()
+    if (trimmed && trimmed !== props.trip.name) emit('rename', props.trip.id, trimmed)
 }
 </script>

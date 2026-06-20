@@ -15,12 +15,14 @@
                 :currentTheme="themeStore.activeTheme"
                 :themeClass="activeThemeConfig.headerClass"
                 :appVersion="appVersion"
+                :canEdit="tripStore.canEdit"
                 @logout="handleLogout"
                 @back="backToList"
                 @create="showCreateForm = true"
                 @update-theme="themeStore.setTheme"
                 @import="handleImportTrip"
                 @share="handleHeaderShare"
+                @rename="(name) => tripStore.renameTrip(tripStore.currentTrip.id, name)"
             />
         </template>
 

@@ -166,7 +166,9 @@ export default {
     },
     trip_card: {
         delete_confirm:
-            'Are you sure you want to delete trip "{name}"? This action cannot be undone.'
+            'Are you sure you want to delete trip "{name}"? This action cannot be undone.',
+        edit_name: 'Rename trip',
+        rename_prompt: 'Enter a new trip name'
     },
     members: {
         title: 'Members',

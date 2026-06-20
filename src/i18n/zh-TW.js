@@ -165,7 +165,9 @@ export default {
         error_failed: '建立失敗，請稍後再試'
     },
     trip_card: {
-        delete_confirm: '確定要刪除行程 "{name}" 嗎？此動作無法復原。'
+        delete_confirm: '確定要刪除行程 "{name}" 嗎？此動作無法復原。',
+        edit_name: '重新命名行程',
+        rename_prompt: '輸入新的行程名稱'
     },
     members: {
         title: '成員管理',

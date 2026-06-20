@@ -241,6 +241,22 @@ export const useTripStore = defineStore('trip', () => {
         }
     }
 
+    function renameTrip(tripId, name) {
+        const trimmed = (name || '').trim()
+        if (!trimmed) return
+        const trip = trips.value.find((t) => t.id === tripId)
+        if (trip) trip.name = trimmed
+        if (currentTrip.value?.id === tripId) currentTrip.value.name = trimmed
+
+        if (authStore.isDemoMode) {
+            localStorage.setItem('maplio_demo_data', JSON.stringify(trips.value))
+        } else {
+            saveTripData(tripId, { name: trimmed }).catch((err) =>
+                console.error('[TripStore] renameTrip failed:', err)
+            )
+        }
+    }
+
     function addLocalTrip(newTrip) {
         if (authStore.isDemoMode) {
             trips.value.unshift(newTrip)
@@ -417,6 +433,7 @@ export const useTripStore = defineStore('trip', () => {
         selectTrip,
         saveData,
         deleteTrip,
+        renameTrip,
         addLocalTrip,
         addDay,
         removeDay,
