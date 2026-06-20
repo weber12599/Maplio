@@ -77,6 +77,22 @@ export default {
         copy_dialog_hint: '請選擇要複製到的天數 (可多選)',
         copy_dialog_confirm: '確認複製 ({count})',
         day_n: 'Day {n}',
+        plan_default_name: '方案 {n}',
+        plan_add: '新增方案',
+        plan_rename: '重新命名',
+        plan_duplicate: '複製方案',
+        plan_delete: '刪除方案',
+        plan_delete_confirm: '確定刪除此方案？',
+        plan_save_to_pool: '存入行程池',
+        saved_to_pool: '已存入行程池',
+        pool_title: '行程池',
+        pool_open: '行程池',
+        pool_save_current: '存入目前方案',
+        pool_empty: '行程池是空的，可把整天行程存進來重複使用。',
+        pool_copy_to_days: '複製到天數',
+        pool_copy_success: '已複製到 {count} 天',
+        pool_remove: '從行程池移除',
+        pool_remove_confirm: '確定從行程池移除？',
         day_summary: '單日摘要',
         day_summary_placeholder: '紀錄本日重點，例如：天氣預報、穿搭建議、總預算...',
         todo_list: '待辦事項',
@@ -149,7 +165,9 @@ export default {
         error_failed: '建立失敗，請稍後再試'
     },
     trip_card: {
-        delete_confirm: '確定要刪除行程 "{name}" 嗎？此動作無法復原。'
+        delete_confirm: '確定要刪除行程 "{name}" 嗎？此動作無法復原。',
+        edit_name: '重新命名行程',
+        rename_prompt: '輸入新的行程名稱'
     },
     members: {
         title: '成員管理',

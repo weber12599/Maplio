@@ -119,6 +119,20 @@
                 @delete-day="tripStore.removeDay"
             />
 
+            <PlanSelector
+                :plans="currentDayPlans"
+                :activePlanId="currentActivePlanId"
+                :canEdit="tripStore.canEdit"
+                :themeConfig="activeThemeConfig"
+                @set-active="(id) => tripStore.setActivePlan(tripStore.activeDay, id)"
+                @add="handleAddPlan"
+                @rename="(id, name) => tripStore.renamePlan(tripStore.activeDay, id, name)"
+                @duplicate="handleDuplicatePlan"
+                @remove="(id) => tripStore.removePlan(tripStore.activeDay, id)"
+                @save-to-pool="handleSavePlanToPool"
+                @open-pool="showPoolDrawer = true"
+            />
+
             <div class="relative flex-grow overflow-hidden">
                 <Transition :name="transitionName">
                     <div
@@ -317,6 +331,18 @@
             :currentUserRole="tripStore.currentUserRole"
             @close="showMembersDialog = false"
         />
+        <PlanPoolDrawer
+            :isOpen="showPoolDrawer"
+            :planPool="tripStore.currentTrip?.planPool || []"
+            :totalDays="tripStore.currentTrip?.itinerary.length || 0"
+            :canEdit="tripStore.canEdit"
+            :themeConfig="activeThemeConfig"
+            @close="showPoolDrawer = false"
+            @save-current="handleSaveCurrentToPool"
+            @copy-to-days="handleCopyPoolPlan"
+            @rename="(id, name) => tripStore.renamePoolPlan(id, name)"
+            @remove="(id) => tripStore.removePoolPlan(id)"
+        />
     </div>
 
     <div v-else class="flex-grow flex items-center justify-center h-full opacity-40">
@@ -335,6 +361,8 @@ import { useI18n } from 'vue-i18n'
 import SpotItem from '../components/Planner/SpotItem.vue'
 import SpotDialog from '../components/Trip/SpotDialog.vue'
 import DayTabs from '../components/Planner/DayTabs.vue'
+import PlanSelector from '../components/Planner/PlanSelector.vue'
+import PlanPoolDrawer from '../components/Planner/PlanPoolDrawer.vue'
 import SearchBar from '../components/Planner/SearchBar.vue'
 import LeafletMap from '../components/Map/LeafletMap.vue'
 import TransportDialog from '../components/Planner/TransportDialog.vue'
@@ -362,6 +390,7 @@ const showTransportDialog = ref(false)
 const showCopyDialog = ref(false)
 const showShareDialog = ref(false)
 const showMembersDialog = ref(false)
+const showPoolDrawer = ref(false)
 const manualSpot = ref({})
 const editingTransportSpot = ref(null)
 const spotToCopy = ref(null)
@@ -387,8 +416,39 @@ const currentDayMeta = computed(() => {
     }
 })
 
+const currentDayPlans = computed(() => {
+    return tripStore.currentTrip?.itinerary?.[tripStore.activeDay]?.plans || []
+})
+
+const currentActivePlanId = computed(() => tripStore.getActivePlanId(tripStore.activeDay))
+
 const handleMetaUpdate = (newData) => {
     tripStore.updateCurrentDayMeta(newData)
+}
+
+const handleAddPlan = () => {
+    const id = tripStore.addPlan(tripStore.activeDay)
+    if (id) tripStore.setActivePlan(tripStore.activeDay, id)
+}
+
+const handleDuplicatePlan = (planId) => {
+    const id = tripStore.duplicatePlan(tripStore.activeDay, planId)
+    if (id) tripStore.setActivePlan(tripStore.activeDay, id)
+}
+
+const handleSavePlanToPool = (planId) => {
+    const id = tripStore.savePlanToPool(tripStore.activeDay, planId)
+    if (id) alert(t('planner.saved_to_pool'))
+}
+
+const handleSaveCurrentToPool = () => {
+    const id = tripStore.savePlanToPool(tripStore.activeDay, currentActivePlanId.value)
+    if (id) alert(t('planner.saved_to_pool'))
+}
+
+const handleCopyPoolPlan = (poolPlanId, dayIndexes) => {
+    tripStore.copyPoolPlanToDays(poolPlanId, dayIndexes)
+    alert(t('planner.pool_copy_success', { count: dayIndexes.length }))
 }
 
 const loadTrip = async (id) => {
@@ -551,15 +611,7 @@ const initiateCopySpot = (spot) => {
 const executeCopySpot = async (targetDayIndexes) => {
     if (!spotToCopy.value || !tripStore.currentTrip) return
     try {
-        const newItinerary = JSON.parse(JSON.stringify(tripStore.currentTrip.itinerary))
-        targetDayIndexes.forEach((dayIdx) => {
-            const newSpot = JSON.parse(JSON.stringify(spotToCopy.value))
-            newSpot.id = Date.now().toString() + Math.random().toString(36).substr(2, 5)
-            if (!newItinerary[dayIdx]) newItinerary[dayIdx] = { spots: [] }
-            newItinerary[dayIdx].spots.push(newSpot)
-        })
-        tripStore.currentTrip.itinerary = newItinerary
-        await tripStore.saveData()
+        tripStore.copySpotToDays(spotToCopy.value, targetDayIndexes)
         alert(t('planner.copy_success', { count: targetDayIndexes.length }))
     } catch (error) {
         console.error(error)

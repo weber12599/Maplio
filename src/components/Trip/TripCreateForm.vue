@@ -141,7 +141,13 @@ const handleCreate = async () => {
     isSubmitting.value = true
     try {
         const itinerary = Array.from({ length: newTrip.value.duration }, () => ({
-            spots: []
+            plans: [
+                {
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                    name: '',
+                    spots: []
+                }
+            ]
         }))
 
         const uid = props.user ? props.user.uid : 'demo-user'

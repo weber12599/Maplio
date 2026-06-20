@@ -17,11 +17,30 @@
             </div>
 
             <span v-if="currentTrip" class="hidden md:block opacity-20">/</span>
+            <input
+                v-if="currentTrip && isEditingName"
+                ref="nameInput"
+                v-model="nameDraft"
+                @keyup.enter="commitName"
+                @keyup.esc="cancelName"
+                @blur="commitName"
+                :class="[
+                    'hidden md:block font-bold max-w-[200px] bg-transparent border-b outline-none',
+                    currentTheme === 'dark' ? 'border-slate-600' : 'border-stone-300'
+                ]"
+            />
             <span
-                v-if="currentTrip"
-                class="hidden md:block font-bold truncate max-w-[200px] opacity-60"
-                >{{ currentTrip.name }}</span
+                v-else-if="currentTrip"
+                @click="startEditName"
+                :class="[
+                    'hidden md:flex items-center gap-1.5 font-bold truncate max-w-[220px] opacity-60',
+                    canEdit ? 'cursor-pointer hover:opacity-100 transition-opacity' : ''
+                ]"
+                :title="canEdit ? $t('trip_card.edit_name') : ''"
             >
+                <span class="truncate">{{ currentTrip.name }}</span>
+                <i v-if="canEdit" class="fa-solid fa-pen text-[10px] opacity-50"></i>
+            </span>
         </div>
 
         <div class="flex items-center gap-3">
@@ -405,7 +424,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { themes } from '../../utils/themeUtils'
 import logoDefault from '@/assets/logos/logo.svg'
@@ -420,7 +439,8 @@ const props = defineProps({
     showAddButton: Boolean,
     currentTheme: String,
     themeClass: String,
-    appVersion: String
+    appVersion: String,
+    canEdit: { type: Boolean, default: false }
 })
 
 const emit = defineEmits([
@@ -430,10 +450,35 @@ const emit = defineEmits([
     'import',
     'share',
     'create',
-    'change-lang'
+    'change-lang',
+    'rename'
 ])
 
 const { t, locale } = useI18n()
+
+const isEditingName = ref(false)
+const nameDraft = ref('')
+const nameInput = ref(null)
+
+const startEditName = async () => {
+    if (!props.canEdit) return
+    nameDraft.value = props.currentTrip?.name || ''
+    isEditingName.value = true
+    await nextTick()
+    nameInput.value?.focus()
+    nameInput.value?.select()
+}
+
+const commitName = () => {
+    if (!isEditingName.value) return
+    isEditingName.value = false
+    const next = nameDraft.value.trim()
+    if (next && next !== props.currentTrip?.name) emit('rename', next)
+}
+
+const cancelName = () => {
+    isEditingName.value = false
+}
 
 const isMenuOpen = ref(false)
 const subMenu = ref(null)

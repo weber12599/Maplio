@@ -27,6 +27,7 @@
                 :userRole="getUserRoleForTrip(trip)"
                 @select="handleSelectTrip"
                 @delete="tripStore.deleteTrip"
+                @rename="(id, name) => tripStore.renameTrip(id, name)"
             />
         </div>
 

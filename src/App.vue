@@ -15,12 +15,14 @@
                 :currentTheme="themeStore.activeTheme"
                 :themeClass="activeThemeConfig.headerClass"
                 :appVersion="appVersion"
+                :canEdit="tripStore.canEdit"
                 @logout="handleLogout"
                 @back="backToList"
                 @create="showCreateForm = true"
                 @update-theme="themeStore.setTheme"
                 @import="handleImportTrip"
                 @share="handleHeaderShare"
+                @rename="(name) => tripStore.renameTrip(tripStore.currentTrip.id, name)"
             />
         </template>
 
@@ -128,7 +130,9 @@ const handleImportTrip = async () => {
             !importedData.name ||
             !Array.isArray(importedData.itinerary) ||
             importedData.itinerary.length === 0 ||
-            !importedData.itinerary.every((day) => Array.isArray(day.spots))
+            !importedData.itinerary.every(
+                (day) => Array.isArray(day.spots) || Array.isArray(day.plans)
+            )
         ) {
             throw new Error(t('app.import_invalid'))
         }
