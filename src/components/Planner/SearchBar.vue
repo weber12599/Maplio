@@ -101,8 +101,11 @@ const query = ref('')
 const expanding = ref(false)
 
 const GOOGLE_MAPS_HOSTNAMES = new Set([
-    'maps.google.com', 'maps.app.goo.gl', 'goo.gl',
-    'google.com', 'www.google.com'
+    'maps.google.com',
+    'maps.app.goo.gl',
+    'goo.gl',
+    'google.com',
+    'www.google.com'
 ])
 
 const isGoogleMapsUrl = (str) => {

@@ -87,7 +87,6 @@
                 </div>
             </div>
 
-
             <button
                 @click="$emit('close')"
                 class="w-full py-3 text-sm font-bold opacity-40 hover:opacity-100 transition-opacity"
