@@ -29,13 +29,14 @@
                     ></textarea>
 
                     <div
+                        v-else
                         :class="[
                             'w-full h-32 p-4 rounded-xl transition-all shadow-sm overflow-y-auto break-words whitespace-pre-wrap',
                             themeConfig.inputClass,
                             !localSummary ? 'text-stone-400 italic' : '',
                             canEdit ? 'cursor-text' : ''
                         ]"
-                        @click="canEdit && handleViewClick"
+                        @click="canEdit && handleViewClick($event)"
                     >
                         <span v-if="localSummary" v-html="formattedSummary"></span>
                         <span v-else>{{ $t('planner.day_summary_placeholder') }}</span>
@@ -124,6 +125,7 @@
                                 class="w-full bg-transparent outline-none border-b border-blue-400"
                             />
                             <span
+                                v-else
                                 :class="[
                                     'block w-full select-none',
                                     todo.done ? 'line-through opacity-60' : '',
