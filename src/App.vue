@@ -22,6 +22,7 @@
                 @update-theme="themeStore.setTheme"
                 @import="handleImportTrip"
                 @share="handleHeaderShare"
+                @export-pdf="handleHeaderExportPdf"
                 @rename="(name) => tripStore.renameTrip(tripStore.currentTrip.id, name)"
             />
         </template>
@@ -112,6 +113,12 @@ const handleTripCreated = () => {
 const handleHeaderShare = () => {
     if (viewComponent.value && viewComponent.value.openShareDialog) {
         viewComponent.value.openShareDialog()
+    }
+}
+
+const handleHeaderExportPdf = () => {
+    if (viewComponent.value && viewComponent.value.exportPdf) {
+        viewComponent.value.exportPdf()
     }
 }
 

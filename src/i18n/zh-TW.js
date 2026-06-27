@@ -21,6 +21,7 @@ export default {
         mode_cloud: '雲端同步模式',
         import_json: '從剪貼簿匯入 JSON',
         share_trip: '分享旅程',
+        export_pdf: '匯出 PDF',
         new_trip: '新增旅程',
         logout: '登出',
         unknown: '未知',
@@ -37,6 +38,10 @@ export default {
         import_success_local: '成功匯入：{name}',
         import_success_cloud: '行程「{name}」已同步至雲端！',
         import_failed: '匯入失敗，格式錯誤或權限不足'
+    },
+    export: {
+        title: '旅遊行程',
+        day_count: '{count} 天'
     },
     login: {
         title: 'Maplio',
