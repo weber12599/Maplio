@@ -356,6 +356,7 @@ import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 import draggable from 'vuedraggable'
 import { parseGoogleMapUrl, getNavUrl } from '../utils/mapUtils'
+import { exportTripToPdf } from '../utils/pdfExportUtils'
 import { useI18n } from 'vue-i18n'
 
 import SpotItem from '../components/Planner/SpotItem.vue'
@@ -728,8 +729,17 @@ const handleTouchEnd = () => {
     }
 }
 
+const exportPdf = () => {
+    if (!tripStore.currentTrip) return
+    exportTripToPdf(tripStore.currentTrip, {
+        t,
+        getActivePlan: tripStore.getActivePlan
+    })
+}
+
 defineExpose({
-    openShareDialog
+    openShareDialog,
+    exportPdf
 })
 </script>
 

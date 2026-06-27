@@ -21,6 +21,7 @@ export default {
         mode_cloud: 'Cloud Sync Mode',
         import_json: 'Import JSON from Clipboard',
         share_trip: 'Share Trip',
+        export_pdf: 'Export PDF',
         new_trip: 'New Trip',
         logout: 'Logout',
         unknown: 'Unknown',
@@ -37,6 +38,10 @@ export default {
         import_success_local: 'Successfully imported: {name}',
         import_success_cloud: 'Trip "{name}" synced to cloud!',
         import_failed: 'Import failed: invalid format or permission denied'
+    },
+    export: {
+        title: 'Travel Itinerary',
+        day_count: '{count} Days'
     },
     login: {
         title: 'Maplio',

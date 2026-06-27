@@ -58,6 +58,19 @@
             </button>
 
             <button
+                v-if="currentTrip"
+                @click="$emit('export-pdf')"
+                :class="[
+                    'flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all active:scale-95',
+                    themes[currentTheme].headerBtnClass
+                ]"
+                :title="$t('app.export_pdf')"
+            >
+                <i class="fa-solid fa-file-pdf"></i>
+                <span class="hidden md:inline">{{ $t('app.export_pdf') }}</span>
+            </button>
+
+            <button
                 v-if="showAddButton"
                 @click="$emit('create')"
                 :class="[
@@ -449,6 +462,7 @@ const emit = defineEmits([
     'logout',
     'import',
     'share',
+    'export-pdf',
     'create',
     'change-lang',
     'rename'
